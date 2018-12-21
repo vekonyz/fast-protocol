@@ -16,9 +16,7 @@ var buffer = encoder.encode('RDPacketHeader', { SenderCompID: 1,
 // create message decoder
 var decoder = new FastStream.Decoder('emdi-7.0.xml')
 
-decoder.decode(buffer, {
-  'RDPacketHeader': function(msg) {
-    console.log('\nRDPacketHeader:', JSON.stringify(msg, null, 2))
-  }
+decoder.decode(buffer, function(msg, name) {
+  console.log(name, JSON.stringify(msg, null, 2))
 })
 ```
