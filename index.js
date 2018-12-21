@@ -323,7 +323,9 @@ Decoder.prototype.decode = function(buffer, callbacks) {
 			var msg = this.decodeGroup(ctx, tpl.elements)
 
 			// call handler if available
-			if (callbacks[tpl.name]) {
+			if (typeof callbacks === 'function') {
+				callbacks(msg, tpl.name)
+			} else if (callbacks[tpl.name]) {
 				callbacks[tpl.name](msg, tpl)
 			} else if (callbacks['default']){
 				callbacks['default'](msg, tpl.name, tpl)
@@ -914,7 +916,7 @@ Encoder.prototype.encode = function(name, value) {
 	// encode message body
 	this.encodeGroup(ctx, tpl, value)
 
-	console.log('\n', name, '=', toHexString(ctx.buffer))
+	//console.log('\n', name, '=', toHexString(ctx.buffer))
 
 	return ctx.buffer
 }
