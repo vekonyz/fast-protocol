@@ -1,5 +1,5 @@
 # fast-protocol
-FAST Streaming Protocol for Node.js (Encoder/Decoder for Javascript) (FAST protocol version 1.1)
+FAST Streaming Protocol for Node.js (Encoder/Decoder for Javascript) (FAST protocol version 1.1) - still developer version, do not use!
 
 ```javascript
 // load fast stream module
