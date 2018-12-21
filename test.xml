@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xmlns="http://www.fixprotocol.org/ns/fast/td/1.1" xmlns:scp="http://www.fixprotocol.org/ns/fast/scp/1.1" templateNs="http://www.nowhere.world/ns/fast/test">
+
+  <template id="70" name="RDPacketHeader">
+    <uInt32 name="SenderCompID" id="49"/>
+    <byteVector name="PacketSeqNum"/>
+    <byteVector name="SendingTime"/>
+  </template>
+
+  <template id="1" name="TestMessage">
+
+    <uInt32 name="MandatoryUInt32" id="11"/>
+
+    <uInt32 name="MandatoryUInt32Increment" id="12">
+      <increment/>
+    </uInt32>
+
+    <uInt32 name="MandatoryUInt32Copy" id="13">
+      <copy/>
+    </uInt32>
+
+    <uInt32 name="MandatoryUInt32Default" id="14">
+      <default value="0"/>
+    </uInt32>
+
+    <uInt32 name="MandatoryUInt32Delta" id="15">
+      <delta/>
+    </uInt32>
+
+    <string name="MandatoryString" id="16">
+	</string>
+
+    <string name="MandatoryStringCopy" id="17">
+	  <copy/>
+	</string>
+
+    <string name="MandatoryStringDefault" id="18">
+	  <default value="DEFVAL"/>
+	</string>
+
+    <string name="MandatoryStringDelta" id="19">
+	  <delta/>
+	</string>
+
+
+    <uInt32 name="OptionalUInt32" id="21" presence="optional"/>
+
+    <uInt32 name="OptionalUInt32Increment" id="22" presence="optional">
+      <increment/>
+    </uInt32>
+
+    <uInt32 name="OptionalUInt32Copy" id="23" presence="optional">
+      <copy/>
+    </uInt32>
+
+    <uInt32 name="OptionalUInt32Default" id="24" presence="optional">
+      <default/>
+    </uInt32>
+
+    <uInt32 name="OptionalUInt32Delta" id="25" presence="optional">
+      <delta/>
+    </uInt32>
+
+    <string name="OptionalString" id="26" presence="optional">
+	</string>
+
+    <string name="OptionalStringCopy" id="27" presence="optional">
+	  <copy/>
+	</string>
+
+    <string name="OptionalStringDefault" id="28" presence="optional">
+	  <default value="OPTDEFVAL"/>
+	</string>
+
+
+
+	<group name="MandatoryGroup">
+      <uInt32 name="GrpMandatoryUInt32" id="111"/>
+
+      <uInt32 name="GrpMandatoryUInt32Increment" id="112">
+        <increment/>
+      </uInt32>
+
+	</group>
+
+	<group name="OptionalGroup" presence="optional">
+      <uInt32 name="GrpMandatoryUInt32" id="211"/>
+	</group>
+
+  </template>
+
+
+  <template id="2" name="UInt32OperatorMessage">
+    <uInt32 name="UInt32Increment" id="34">
+      <increment/>
+    </uInt32>
+
+    <uInt32 name="UInt32Default" id="34">
+      <default value="0"/>
+    </uInt32>
+  </template>
+
+  <template id="3" name="DecimalMessage">
+    <decimal name="MandatoryDecimal" id="71"/>
+
+    <decimal name="MandatoryDecimalCopy" id="73">
+      <copy/>
+    </decimal>
+
+
+    <decimal name="OptionalDecimal" id="81" presence="optional"/>
+
+  </template>
+
+
+
+
+  <template id="4" name="SequenceMessage">
+    <sequence name="MandatorySequence">
+      <length name="NoMandatorySequence"/>
+      <uInt32 name="SeqMandatoryUInt32" id="311"/>
+
+      <uInt32 name="SeqMandatoryUInt32Increment" id="312">
+        <increment/>
+      </uInt32>
+    </sequence>
+
+    <sequence name="OptionalSequence" presence="optional">
+      <length name="NoOptionalSequence"/>
+      <uInt32 name="SeqMandatoryUInt32" id="311"/>
+    </sequence>
+
+    <sequence name="OptionalSequenceConstLength" presence="optional">
+      <length name="NoOptionalSequenceConstLength">
+        <constant value="2" />
+      </length>
+      <uInt32 name="SeqMandatoryUInt32" id="311"/>
+    </sequence>
+
+  </template>
+
+
+  <template id="5" name="GroupMessage">
+
+    <group name="MandatoryGroup">
+      <uInt32 name="GrpMandatoryUInt32" id="211"/>
+    </group>
+
+    <group name="OptionalGroup" presence="optional">
+      <uInt32 name="GrpMandatoryUInt32" id="211"/>
+    </group>
+
+  </template>
+
+</templates>
