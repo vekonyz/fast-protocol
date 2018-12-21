@@ -1,4 +1,6 @@
 var FastStream = require('./index.js')
+//var assert = require('assert');
+var diff = require('deep-diff')
 
 function testCodec(messages) {
   var buffer = []
@@ -14,11 +16,41 @@ function testCodec(messages) {
   var decoder = new FastStream.Decoder('test.xml')
   var i = 0
   decoder.decode(buffer, function(msg, name) {
+
+    var differences = diff(messages[i].msg, msg)
+    if (differences != null) {
+      //console.log(differences)
+      for (var d = 0; d < differences.length; ++d) {
+        switch (differences[i].kind) {
+          case 'N': // indicates a newly added property/element
+            console.log('Error: Additional property found:', differences[d].path.join('.'))
+            break
+          case 'D': // indicates a property/element was deleted
+            console.log('Error: Property ', differences[d].path.join('.'), 'missing')
+            break
+          case 'E': // indicates a property/element was changed
+            if ( (differences[d].path.length) > 1 && (differences[d].path[1] === parseInt(differences[d].path[1], 10)) ) {
+              console.log('Error: Property value', differences[d].path[0], '[', differences[d].path[1], ']', 'differs:', differences[d].lhs, '<>', differences[d].rhs)
+            } else {
+              console.log('Error: Property value', differences[d].path.join('.'), 'differs:', differences[d].lhs, '<>', differences[d].rhs)
+            }
+            break
+          case 'A': // indicates a change occurred within an array
+            console.log('Error: Array content ', differences[d].path.join('.'), 'differs:', differences[d].lhs, '<>', differences[d].rhs)
+            break
+        }
+      }
+      throw new Error('Decoded message does not match epected message')
+    }
+    ++i
+
+    //assert.deepEqual(messages[i].msg, msg, differences)
+    /*
     if (JSON.stringify(messages[i++].msg) !== JSON.stringify(msg)) {
       console.log('Output message:', msg)
       console.log('Expected message:', messages[i-1].msg)
       throw new Error('Decoded message does not match input message')
-    }
+    }*/
   })
 }
 
