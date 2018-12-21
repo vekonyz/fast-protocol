@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cr315/fast-protocol.git"
+    "url": "git+https://github.com/vekonyz/fast-protocol.git"
   },
   "dependencies": {
     "xml-js": "^1.6.8"
@@ -25,7 +25,7 @@
   "author": "Zoltan Vekony",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cr315/fast-protocol/issues"
+    "url": "https://github.com/vekonyz/fast-protocol/issues"
   },
-  "homepage": "https://github.com/cr315/fast-protocol#readme"
+  "homepage": "https://github.com/vekonyz/fast-protocol#readme"
 }
