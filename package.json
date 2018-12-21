@@ -1,10 +1,11 @@
 {
   "name": "fast-protocol",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "FAST streaming protocol for Node.js (Encoder/Decoder for Javascript) (FAST protocol version 1.1)",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+	"prepublish": "npm test"
   },
   "repository": {
     "type": "git",
