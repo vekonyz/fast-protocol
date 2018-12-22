@@ -1,5 +1,6 @@
 
 var convert = require('xml-js')
+var Long = require('long')
 var fs = require('fs');
 
 
@@ -457,7 +458,7 @@ Decoder.prototype.decodeUInt64Value = function(ctx, field) {
 }
 
 Decoder.prototype.decodeInt64Value = function(ctx, field) {
-	//console.log('DecodeInt64Value', field.name, field.isOptional(), field.operator)
+	console.log('DecodeInt64Value', field.name, field.isOptional(), field.operator)
 	var optional = field.isOptional()
 	if (!field.hasOperator()) return this.decodeI64(optional)
 
@@ -675,14 +676,16 @@ Decoder.prototype.decodeI64 = function(optional) {
 		}
 	}
 
-	var val = (this.buffer[this.pos] & 0x40) > 0? -1 : 0
+	//var val = (this.buffer[this.pos] & 0x40) > 0 ? -1 : 0
+	var val = Long.fromInt((this.buffer[this.pos] & 0x40) > 0 ? -1 : 0)
 	for (; this.pos < this.buffer.length; ) {
 		var byteVal = this.buffer[this.pos++]
-		val = (val << 7) + (byteVal & 0x7f)
+		//val = (val << 7) + (byteVal & 0x7f)
+		val = val.shiftLeft(7).or(byteVal & 0x7f)
 		if (byteVal & 0x80) break
 	}
 
-	return val
+	return val.toString(10)
 }
 
 Decoder.prototype.decodeU64 = function(optional) {
@@ -690,22 +693,21 @@ Decoder.prototype.decodeU64 = function(optional) {
 		var byteVal = this.buffer[this.pos]
 		if (byteVal == 0x80)
 		{
-			//s.clear();
 			++this.pos;
 			return undefined;
 		}
 	}
 
-	var val = 0
+	var val = Long.ZERO
 	//console.log('Decoding', this.buffer.length - this.pos, 'bytes')
 	for (; this.pos < this.buffer.length; ) {
 		var byteVal = this.buffer[this.pos++]
 		//console.log('Byte:', byteVal & 0x7f)
-		val = (val << 7) + (byteVal & 0x7f)
+		val = val.shiftLeft(7).or(byteVal & 0x7f)
 		if (byteVal & 0x80) break
 	}
 
-	return val
+	return val.toString(10)
 }
 
 Decoder.prototype.decodeDecimal = function(optional) {
@@ -912,7 +914,7 @@ Encoder.prototype.encodeGroup = function(ctx, field, value, start) {
 				this.encodeUInt32Value(ctx, element, value[fieldName])
 				break
 			case 'int64':
-				//this.encodeInt64Value(ctx, element, value[fieldName])
+				this.encodeInt64Value(ctx, element, value[fieldName])
 				break
 			case 'uInt64':
 				//this.encodeUInt64Value(ctx, element, value[fieldName])
@@ -975,7 +977,7 @@ Encoder.prototype.encodeUInt32Value = function(ctx, field, value) {
 		if (optional && !value) {
 			this.encodeNull(ctx)
 		} else {
-			this.encodeU(ctx, value, optional)
+			this.encodeU32(ctx, value, optional)
 		}
 		return
 	}
@@ -992,14 +994,14 @@ Encoder.prototype.encodeUInt32Value = function(ctx, field, value) {
 				ctx.setBit(false)
 			} else {
 				ctx.setBit(true)
-				this.encodeU(ctx, value, optional)
+				this.encodeU32(ctx, value, optional)
 				entry.assign(value)
 			}
 			break
 		case 'default':
 			if (value != field.operator.value) {
 				ctx.setBit(true)
-				this.encodeU(ctx, value, optional)
+				this.encodeU32(ctx, value, optional)
 			} else {
 				ctx.setBit(false)
 			}
@@ -1010,7 +1012,7 @@ Encoder.prototype.encodeUInt32Value = function(ctx, field, value) {
 				ctx.setBit(false)
 			} else {
 				ctx.setBit(true)
-				this.encodeU(ctx, value, optional)
+				this.encodeU32(ctx, value, optional)
 			}
 			entry.assign(value)
 			break
@@ -1019,7 +1021,7 @@ Encoder.prototype.encodeUInt32Value = function(ctx, field, value) {
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
 			var deltaValue = value ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
-			this.encodeI(ctx, deltaValue, optional)
+			this.encodeI32(ctx, deltaValue, optional)
 			entry.assign(value)
 			break
 	}
@@ -1032,7 +1034,7 @@ Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
 		if (optional && !value) {
 			this.encodeNull(ctx)
 		} else {
-			this.encodeI(ctx, value, optional)
+			this.encodeI32(ctx, value, optional)
 		}
 		return
 	}
@@ -1049,14 +1051,14 @@ Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
 				ctx.setBit(false)
 			} else {
 				ctx.setBit(true)
-				this.encodeI(ctx, value, optional)
+				this.encodeI32(ctx, value, optional)
 				entry.assign(value)
 			}
 			break
 		case 'default':
 			if (value != field.operator.value) {
 				ctx.setBit(true)
-				this.encodeI(ctx, value, optional)
+				this.encodeI32(ctx, value, optional)
 			} else {
 				ctx.setBit(false)
 			}
@@ -1067,7 +1069,7 @@ Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
 				ctx.setBit(false)
 			} else {
 				ctx.setBit(true)
-				this.encodeI(ctx, value, optional)
+				this.encodeI32(ctx, value, optional)
 			}
 			entry.assign(value)
 			break
@@ -1076,7 +1078,64 @@ Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
 			var deltaValue = value ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
-			this.encodeI(ctx, deltaValue, optional)
+			this.encodeI32(ctx, deltaValue, optional)
+			entry.assign(value)
+			break
+	}
+}
+
+Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
+	console.log('EncodeUInt32Value:', field.name, value, 'OPT:', field.isOptional(), 'HAS_OP:', field.hasOperator())
+	var optional = field.isOptional()
+	if (!field.hasOperator()) {
+		if (optional && !value) {
+			this.encodeNull(ctx)
+		} else {
+			this.encodeI64(ctx, Long.fromValue(value), optional)
+		}
+		return
+	}
+
+	switch (field.operator.name) {
+		case 'constant':
+			if (optional) {
+				ctx.setBit(value != null)
+			}
+			break
+		case 'copy':
+			var entry = this.Dictionary.getField(field.name)
+			if (entry.isAssigned() && value == entry.Value) {
+				ctx.setBit(false)
+			} else {
+				ctx.setBit(true)
+				this.encodeI64(ctx, value, optional)
+				entry.assign(value)
+			}
+			break
+		case 'default':
+			if (value != field.operator.value) {
+				ctx.setBit(true)
+				this.encodeI64(ctx, value, optional)
+			} else {
+				ctx.setBit(false)
+			}
+			break
+		case 'increment':
+			var entry = this.Dictionary.getField(field.name)
+			if (entry.isAssigned() && value == entry.Value + 1) {
+				ctx.setBit(false)
+			} else {
+				ctx.setBit(true)
+				this.encodeI64(ctx, value, optional)
+			}
+			entry.assign(value)
+			break
+		case 'tail':
+			break
+		case 'delta':
+			var entry = this.Dictionary.getField(field.name)
+			var deltaValue = value ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
+			this.encodeI64(ctx, deltaValue, optional)
 			entry.assign(value)
 			break
 	}
@@ -1089,8 +1148,8 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, value) {
 		if (optional && !value) {
 			this.encodeNull(ctx)
 		} else {
-			this.encodeI(ctx, value.e, optional)
-			this.encodeI(ctx, value.m, false)
+			this.encodeI32(ctx, value.e, optional)
+			this.encodeI64(ctx, Long.fromValue(value.m), false)
 		}
 		return
 	}
@@ -1107,15 +1166,16 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, value) {
 				ctx.setBit(false)
 			} else {
 				ctx.setBit(true)
-				this.encodeI(ctx, value.e, optional)
-				this.encodeI(ctx, value.m, false)
+				this.encodeI32(ctx, value.e, optional)
+				this.encodeI64(ctx, Long.fromValue(value.m), false)
 				entry.assign(value)
 			}
 			break
 		case 'default':
 			if (value != field.operator.value) {
 				ctx.setBit(true)
-				this.encodeU(ctx, value, optional)
+				this.encodeI32(ctx, value.e, optional)
+				this.encodeI64(ctx, Long.fromValue(value.m), false)
 			} else {
 				ctx.setBit(false)
 			}
@@ -1126,7 +1186,8 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, value) {
 				ctx.setBit(false)
 			} else {
 				ctx.setBit(true)
-				this.encodeU(ctx, value, optional)
+				this.encodeI32(ctx, value.e, optional)
+				this.encodeI64(ctx, Long.fromValue(value.m), false)
 			}
 			entry.assign(value)
 			break
@@ -1135,7 +1196,8 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, value) {
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
 			var deltaValue = value ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
-			this.encodeI(ctx, deltaValue, optional)
+			this.encodeI32(ctx, value.e, optional)
+			this.encodeI64(ctx, Long.fromValue(value.m), false)
 			entry.assign(value)
 			break
 	}
@@ -1243,7 +1305,7 @@ Encoder.prototype.encodeByteVectorValue = function(ctx, field, value) {
 	}
 }
 
-Encoder.prototype.getSizeU = function(value)
+Encoder.prototype.getSizeU32 = function(value)
 {
 	if (value < 128)                return 1; // 2 ^ 7
 	if (value < 16384)              return 2; // 2 ^ 14
@@ -1256,7 +1318,29 @@ Encoder.prototype.getSizeU = function(value)
 	return 9;
 }
 
-Encoder.prototype.getSizeI = function(value)
+Encoder.prototype.getSizeU64 = function(value)
+{
+	const L128 = Long.fromInt(128, true)
+	const L16384 = Long.fromInt(16384, true)
+	const L2097152 = Long.fromInt(2097152, true)
+	const L268435456 = Long.fromInt(268435456, true)
+	const L34359738368 = Long.fromString("34359738368", true)
+	const L4398046511104 = Long.fromString("4398046511104", true)
+	const L562949953421312 = Long.fromString("562949953421312", true)
+	const L72057594037927936 = Long.fromString("72057594037927936", true)
+
+	if (value.lessThan(L128))								return 1; // 2 ^ 7
+	if (value.lessThan(L16384))							return 2; // 2 ^ 14
+	if (value.lessThan(L2097152))						return 3; // 2 ^ 21
+	if (value.lessThan(L268435456))					return 4; // 2 ^ 28
+	if (value.lessThan(L34359738368))				return 5; // 2 ^ 35
+	if (value.lessThan(L4398046511104))			return 6; // 2 ^ 42
+	if (value.lessThan(L562949953421312))		return 7; // 2 ^ 49
+	if (value.lessThan(L72057594037927936))	return 8; // 2 ^ 56
+	return 9;
+}
+
+Encoder.prototype.getSizeI32 = function(value)
 {
 	if ((value >= -64) && (value <= 63))																	return 1; // - 2 ^ 6 ... 2 ^ 6 -1
 	if ((value >= -8192) && (value <= 8191))															return 2; // - 2 ^ 13 ... 2 ^ 13 -1
@@ -1267,6 +1351,39 @@ Encoder.prototype.getSizeI = function(value)
 	if ((value >= -281474976710656) && (value <= 281474976710655))				return 7; // - 2 ^ 48 ... 2 ^ 48 -1
 	if ((value >= -36028797018963968) && (value <= 36028797018963967))		return 8; // - 2 ^ 55 ... 2 ^ 55 -1
 	if ((value >= -4611686018427387904 && value <= 4611686018427387903))	return 9;
+	return 10;
+}
+
+Encoder.prototype.getSizeI64 = function(value)
+{
+	const L64N = Long.fromInt(-64)
+	const L63 = Long.fromInt(63)
+	const L8192N = Long.fromInt(-8192)
+	const L8191 = Long.fromInt(8191)
+	const L1048576N = Long.fromInt(-1048576)
+	const L1048575 = Long.fromInt(1048575)
+	const L134217728N = Long.fromInt(-134217728)
+	const L134217727 = Long.fromInt(134217727)
+	const L17179869184N = Long.fromString("-17179869184")
+	const L17179869183 = Long.fromString("17179869183")
+	const L2199023255552N = Long.fromString("-2199023255552")
+	const L2199023255551 = Long.fromString("2199023255551")
+	const L281474976710656N = Long.fromString("-281474976710656")
+	const L281474976710655 = Long.fromString("281474976710655")
+	const L36028797018963968N = Long.fromString("-36028797018963968")
+	const L36028797018963967 = Long.fromString("36028797018963967")
+	const L4611686018427387904N = Long.fromString("-4611686018427387904")
+	const L4611686018427387903 = Long.fromString("4611686018427387903")
+
+	if (value.greaterThanOrEqual(L64N) && value.lessThanOrEqual(L63)) return 1; // - 2 ^ 6 ... 2 ^ 6 -1
+	if (value.greaterThanOrEqual(L8192N) && value.lessThanOrEqual(L8191)) return 2; // - 2 ^ 13 ... 2 ^ 13 -1
+	if (value.greaterThanOrEqual(L1048576N) && value.lessThanOrEqual(L1048575)) return 3; // - 2 ^ 20 ... 2 ^ 20 -1
+	if (value.greaterThanOrEqual(L134217728N) && value.lessThanOrEqual(L134217727)) return 4; // - 2 ^ 27 ... 2 ^ 27 -1
+	if (value.greaterThanOrEqual(L17179869184N) && value.lessThanOrEqual(L17179869183)) return 5; // - 2 ^ 34 ... 2 ^ 34 -1
+	if (value.greaterThanOrEqual(L2199023255552N) && value.lessThanOrEqual(L2199023255551)) return 6; // - 2 ^ 41 ... 2 ^ 41 -1
+	if (value.greaterThanOrEqual(L281474976710656N) && value.lessThanOrEqual(L281474976710655)) return 7; // - 2 ^ 48 ... 2 ^ 48 -1
+	if (value.greaterThanOrEqual(L36028797018963968N) && value.lessThanOrEqual(L36028797018963967)) return 8; // - 2 ^ 55 ... 2 ^ 55 -1
+	if (value.greaterThanOrEqual(L4611686018427387904N) && value.lessThanOrEqual(L4611686018427387903))	return 9;
 	return 10;
 }
 
@@ -1291,13 +1408,13 @@ Encoder.prototype.encodeNull = function(ctx) {
 	ctx.buffer.push(0x80)
 }
 
-Encoder.prototype.encodeU = function(ctx, value, optional)
+Encoder.prototype.encodeU32 = function(ctx, value, optional)
 {
 	if (optional && value == null) {
 		this.encodeNull(ctx)
 	} else {
 		//console.log('EncodeU', value)
-		var size = this.getSizeU(value)
+		var size = this.getSizeU32(value)
 		for (var i = 0; i < size; ++i)
 			ctx.buffer.push((value >> this.SHIFT[size - i]) & 0x7f)
 
@@ -1308,7 +1425,26 @@ Encoder.prototype.encodeU = function(ctx, value, optional)
 	return this
 }
 
-Encoder.prototype.encodeI = function(ctx, value, optional)
+Encoder.prototype.encodeU64 = function(ctx, value, optional)
+{
+	if (optional && value == null) {
+		this.encodeNull(ctx)
+	} else {
+		//console.log('EncodeU', value)
+		var size = this.getSizeU64(value)
+		for (var i = 0; i < size; ++i) {
+			//ctx.buffer.push((value >> this.SHIFT[size - i]) & 0x7f)
+			ctx.buffer.push((value.shiftRight(this.SHIFT[size - i]).getLowBitsUnsigned() & 0x7f))
+		}
+
+		// set stop bit
+		ctx.buffer[ctx.buffer.length - 1] |= 0x80
+	}
+
+	return this
+}
+
+Encoder.prototype.encodeI32 = function(ctx, value, optional)
 {
 	if (optional && value == null) {
 		this.encodeNull(ctx)
@@ -1320,7 +1456,7 @@ Encoder.prototype.encodeI = function(ctx, value, optional)
 		value += 1
 	}
 
-	var size = this.getSizeI(value);
+	var size = this.getSizeI32(value);
 	var sign = ctx.buffer.length - 1
 	//uint8_t * sign = m_stream;
 
@@ -1338,6 +1474,43 @@ Encoder.prototype.encodeI = function(ctx, value, optional)
 		//console.log('SET_SIGN', ctx.buffer[sign], sign)
 		//ctx.buffer[sign] |= 0x40
 	}
+	//*sign |= (0x40 & (value >> SIGN_SHIFT));
+
+	return this
+}
+
+Encoder.prototype.encodeI64 = function(ctx, value, optional)
+{
+	if (optional && value == null) {
+		this.encodeNull(ctx)
+		return this
+	}
+
+	//var SIGN_SHIFT = (sizeof(T) * 8 - 7);
+	if (optional && value.greaterThanOrEqual(Long.ZERO)) {
+		value = value.add(Long.ONE)
+	}
+
+	var size = this.getSizeI64(value);
+	var sign = ctx.buffer.length - 1
+
+	//console.log('encodeI64:', value.toString(10), 'SIZE:', size)
+
+	for (var i = 0; i < size; ++i) {
+		var byte = value.shiftRight(this.SHIFT[size - i]).getLowBits() & 0x7f
+		//ctx.buffer.push((value >> this.SHIFT[size - i]) & (i > 0 ? 0x7f : 0x7f))
+		//ctx.buffer.push(value.shiftRight(this.SHIFT[size - i]).getLowBits() & 0x7f)
+		ctx.buffer.push(byte)
+	}
+
+	// set stop bit
+	ctx.buffer[ctx.buffer.length - 1] |= 0x80
+
+	// set sign
+	//if (value < 0) {
+		//console.log('SET_SIGN', ctx.buffer[sign], sign)
+		//ctx.buffer[sign] |= 0x40
+	//}
 	//*sign |= (0x40 & (value >> SIGN_SHIFT));
 
 	return this
@@ -1375,20 +1548,20 @@ Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 	{
 		if (pre == post && pre == value.length) {
 			//console.log('STRING EQUALS')
-			this.encodeI(ctx, 0, optional)
+			this.encodeI32(ctx, 0, optional)
 			this.encodeString(ctx, "", false)
 		} else if ( pre < post ) {
 			//console.log('POST', post - dict.length - 1, value.substring(0, value.length - post))
-			this.encodeI(ctx, post - dict.length - 1, optional)
+			this.encodeI32(ctx, post - dict.length - 1, optional)
 			this.encodeString(ctx, value.substring(0, value.length - post), false)
 		} else {
 			//console.log('PRE', dict.length - pre , value.substring(pre))
-			this.encodeI(ctx, dict.length - pre, optional)
+			this.encodeI32(ctx, dict.length - pre, optional)
 			this.encodeString(ctx, value.substring(pre), false)
 		}
 	} else {
 		//console.log('ENCODE DELTA ALL', value, dict.length)
-		this.encodeI(ctx, dict.length, optional)
+		this.encodeI32(ctx, dict.length, optional)
 		this.encodeString(ctx, value, false)
 	}
 
@@ -1402,7 +1575,7 @@ Encoder.prototype.encodeByteVector = function(ctx, value, optional) {
 	}
 
 	// encode length
-	this.encodeU(ctx, value.length, optional)
+	this.encodeU32(ctx, value.length, optional)
 
 	// append content
 	ctx.buffer.push.apply(ctx.buffer, value)

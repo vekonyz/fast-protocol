@@ -1,6 +1,6 @@
 {
   "name": "fast-protocol",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "FAST streaming protocol for Node.js (Encoder/Decoder for Javascript) (FAST protocol version 1.1)",
   "main": "index.js",
   "scripts": {
@@ -12,6 +12,7 @@
     "url": "git+https://github.com/vekonyz/fast-protocol.git"
   },
   "dependencies": {
+    "long": "^4.0.0",
     "xml-js": "^1.6.8"
   },
   "devDependencies": {

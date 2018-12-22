@@ -2,7 +2,7 @@ var FastStream = require('./index.js')
 //var assert = require('assert');
 var diff = require('deep-diff')
 
-var logDebug = false
+var logDebug = true
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -86,6 +86,21 @@ testCodec([
   }
 ])
 
+testCodec([
+  {
+    name: "Int64TestMessage",
+    msg: {
+      Int64Array: [
+        {MandatoryInt64: "1"},
+        {MandatoryInt64: "1000"},
+        {MandatoryInt64: "1000000"},
+        {MandatoryInt64: "1000000000"},
+        {MandatoryInt64: "1000000000000"},
+        {MandatoryInt64: "1000000000000000"}
+      ]
+    }
+  }
+])
 
 // test RDPacketHeader
 testCodec([
@@ -181,6 +196,7 @@ testCodec([
 ])
 
 // test DecimalMessage
+/*
 testCodec([
   {
     name: "DecimalMessage",
@@ -191,6 +207,7 @@ testCodec([
     }
   }
 ])
+*/
 
 // test SequenceMessage
 testCodec([

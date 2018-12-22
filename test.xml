@@ -167,5 +167,14 @@
     </sequence>
   </template>
 
+  <template id="8" name="Int64TestMessage">
+    <sequence name="Int64Array">
+      <length name="NoInteger"/>
+      <int64 name="MandatoryInt64" id="1">
+        <!--delta/-->
+      </int64>
+    </sequence>
+  </template>
+
 
 </templates>
