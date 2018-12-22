@@ -2,6 +2,8 @@ var FastStream = require('./index.js')
 //var assert = require('assert');
 var diff = require('deep-diff')
 
+var logDebug = false
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // - encode provided messages
@@ -16,7 +18,7 @@ function testCodec(messages) {
   // encode messages ony by one
   var encoder = new FastStream.Encoder('test.xml')
   for (var i = 0; i < messages.length; ++i) {
-    //console.log('Input message:', messages[i].msg)
+    if (logDebug) console.log('Input message:', messages[i].msg)
     buffer = buffer.concat(encoder.encode(messages[i].name, messages[i].msg))
   }
 
@@ -25,26 +27,28 @@ function testCodec(messages) {
   var i = 0
   decoder.decode(buffer, function(msg, name) {
 
+    if (logDebug) console.log('Output message:', msg)
+
     var differences = diff(messages[i].msg, msg)
     if (differences != null) {
       //console.log(differences)
       for (var d = 0; d < differences.length; ++d) {
-        switch (differences[i].kind) {
+        switch (differences[d].kind) {
           case 'N': // indicates a newly added property/element
-            console.log('Error: Additional property found:', differences[d].path.join('.'))
+            console.log('Error: Additional property found:', messages[i].name, '.', differences[d].path.join('.'))
             break
           case 'D': // indicates a property/element was deleted
-            console.log('Error: Property ', differences[d].path.join('.'), 'missing')
+            console.log('Error: Property ', messages[i].name, '.', differences[d].path.join('.'), 'missing')
             break
           case 'E': // indicates a property/element was changed
-            if ( (differences[d].path.length) > 1 && (differences[d].path[1] === parseInt(differences[d].path[1], 10)) ) {
-              console.log('Error: Property value', differences[d].path[0], '[', differences[d].path[1], ']', 'differs:', differences[d].lhs, '<>', differences[d].rhs)
+            if ( (differences[d].path.length) > 1 && (differences[d].path[differences[d].path.length - 1] === parseInt(differences[d].path[differences[d].path.length - 1], 10)) ) {
+              console.log('Error: Property value', messages[i].name, '.', differences[d].slice(0, differences[d].path.length - 1).join('.'), '[', differences[d].path[differences[d].path.length - 1], ']', 'differs:', differences[d].lhs, '<>', differences[d].rhs)
             } else {
-              console.log('Error: Property value', differences[d].path.join('.'), 'differs:', differences[d].lhs, '<>', differences[d].rhs)
+              console.log('Error: Property value', messages[i].name, '.', differences[d].path.join('.'), 'differs:', differences[d].lhs, '<>', differences[d].rhs)
             }
             break
           case 'A': // indicates a change occurred within an array
-            console.log('Error: Array content ', differences[d].path.join('.'), 'differs:', differences[d].lhs, '<>', differences[d].rhs)
+            console.log('Error: Array content ', messages[i].name, '.', differences[d].path.join('.'), 'differs:', differences[d].lhs, '<>', differences[d].rhs)
             break
         }
       }
@@ -123,7 +127,7 @@ testCodec([
       MandatoryString: 'HELLO',
       MandatoryStringCopy: 'XXX',
       MandatoryStringDefault: 'HELLO',
-      MandatoryStringDelta: '123456',
+      MandatoryStringDelta: '123789',
       OptionalUInt32: 100,
       OptionalUInt32Increment: 201,
       OptionalUInt32Copy: 300,

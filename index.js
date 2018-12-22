@@ -587,7 +587,6 @@ Decoder.prototype.decodeStringValue = function(ctx, field) {
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
 			var length = this.decodeI32(optional)
-			//console.log('DECODE STR DELTA LENGTH', length)
 			if (optional && length == null) {
 				entry.assign(undefined)
 				return undefined
@@ -596,7 +595,7 @@ Decoder.prototype.decodeStringValue = function(ctx, field) {
 				if (length < 0) {
 					entry.assign(str + entry.Value.substring(length * -1))
 				} else if (length > 0) {
-					entry.assign(entry.Value.substring(entry.Value.length - length) + str)
+					entry.assign(entry.Value.substring(0, entry.Value.length - length) + str)
 				} else { // length == 0
 					entry.assign(entry.isAssigned() ? entry.Value + str : str)
 				}
@@ -1376,8 +1375,6 @@ Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 	}
 	var post = value.length - i
 
-	//console.log('STRING_DELTA', value, dict, 'PRE' , pre, 'POST', post)
-
 	//var begin = ctx.buffer.length
 	if ( pre > 0 || post > 0 )
 	{
@@ -1386,15 +1383,11 @@ Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 			this.encodeI(ctx, 0, optional)
 			this.encodeString(ctx, "", false)
 		} else if ( pre < post ) {
-			//console.log('ENCODE DELTA POST', value.substring(value.length - post), post)
-			// matches <post> byte(s) at the end of the previous value, remove <dl  - post> byte(s) at the front of the previous value, and encode <vl - post> byte(s)
 			this.encodeI(ctx, post, optional)
-			this.encodeString(ctx, value.substring(value.length - post), false)
+			this.encodeString(ctx, value.substring(0, value.length - post), false)
 		} else {
-			// matches <pre> byte(s) at the beginning of the previous value, remove <dl - pre> byte(s) at the end of the previous value, and encode <vl - pre> byte(s)
-			//console.log('ENCODE DELTA PRE', value.substring(0, pre), pre * -1)
-			this.encodeI(ctx, pre * -1, optional)
-			this.encodeString(ctx, value.substring(0, pre), false)
+			this.encodeI(ctx, pre, optional)
+			this.encodeString(ctx, value.substring(pre), false)
 		}
 	} else {
 		// mo match found, remove full previous value with <dl> byte(s) and encode full new value <value> with <vl> byte(s)
