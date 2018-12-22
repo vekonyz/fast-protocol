@@ -1366,13 +1366,8 @@ Encoder.prototype.encodeString = function(ctx, value, optional) {
 
 Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 {
-	for (var pre = 0; pre < value.length && pre < dict.length && value.charCodeAt(pre) == dict.charCodeAt(pre); ++pre) {
-		//console.log('CHAR1', value.charCodeAt(pre), dict.charCodeAt(pre))
-	}
-
-	for (var i = value.length, j = dict.length; i > 0 && j > 0 && value.charCodeAt(i - 1) == dict.charCodeAt(j - 1); --i, --j) {
-		//console.log('CHAR2', value.charCodeAt(i - 1), dict.charCodeAt(j - 1))
-	}
+	for (var pre = 0; pre < value.length && pre < dict.length && value.charCodeAt(pre) == dict.charCodeAt(pre); ++pre) {}
+	for (var i = value.length, j = dict.length; i > 0 && j > 0 && value.charCodeAt(i - 1) == dict.charCodeAt(j - 1); --i, --j) {}
 	var post = value.length - i
 
 	//var begin = ctx.buffer.length
@@ -1383,14 +1378,15 @@ Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 			this.encodeI(ctx, 0, optional)
 			this.encodeString(ctx, "", false)
 		} else if ( pre < post ) {
-			this.encodeI(ctx, post, optional)
+			//console.log('POST', post - dict.length, value.substring(0, value.length - post))
+			this.encodeI(ctx, post - dict.length, optional)
 			this.encodeString(ctx, value.substring(0, value.length - post), false)
 		} else {
-			this.encodeI(ctx, pre, optional)
+			//console.log('PRE', dict.length - pre, value.substring(pre))
+			this.encodeI(ctx, dict.length - pre, optional)
 			this.encodeString(ctx, value.substring(pre), false)
 		}
 	} else {
-		// mo match found, remove full previous value with <dl> byte(s) and encode full new value <value> with <vl> byte(s)
 		//console.log('ENCODE DELTA ALL', value, dict.length)
 		this.encodeI(ctx, dict.length, optional)
 		this.encodeString(ctx, value, false)

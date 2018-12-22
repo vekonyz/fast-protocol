@@ -28,47 +28,47 @@
     </uInt32>
 
     <string name="MandatoryString" id="16">
-	</string>
+	  </string>
 
     <string name="MandatoryStringCopy" id="17">
-	  <copy/>
-	</string>
+	     <copy/>
+	  </string>
 
     <string name="MandatoryStringDefault" id="18">
-	  <default value="DEFVAL"/>
-	</string>
+	     <default value="DEFVAL"/>
+    </string>
 
     <string name="MandatoryStringDelta" id="19">
-	  <delta/>
+	     <delta/>
+    </string>
+
+
+  <uInt32 name="OptionalUInt32" id="21" presence="optional"/>
+
+  <uInt32 name="OptionalUInt32Increment" id="22" presence="optional">
+    <increment/>
+  </uInt32>
+
+  <uInt32 name="OptionalUInt32Copy" id="23" presence="optional">
+    <copy/>
+  </uInt32>
+
+  <uInt32 name="OptionalUInt32Default" id="24" presence="optional">
+    <default/>
+  </uInt32>
+
+  <uInt32 name="OptionalUInt32Delta" id="25" presence="optional">
+    <delta/>
+  </uInt32>
+
+  <string name="OptionalString" id="26" presence="optional">
 	</string>
 
-
-    <uInt32 name="OptionalUInt32" id="21" presence="optional"/>
-
-    <uInt32 name="OptionalUInt32Increment" id="22" presence="optional">
-      <increment/>
-    </uInt32>
-
-    <uInt32 name="OptionalUInt32Copy" id="23" presence="optional">
-      <copy/>
-    </uInt32>
-
-    <uInt32 name="OptionalUInt32Default" id="24" presence="optional">
-      <default/>
-    </uInt32>
-
-    <uInt32 name="OptionalUInt32Delta" id="25" presence="optional">
-      <delta/>
-    </uInt32>
-
-    <string name="OptionalString" id="26" presence="optional">
-	</string>
-
-    <string name="OptionalStringCopy" id="27" presence="optional">
+  <string name="OptionalStringCopy" id="27" presence="optional">
 	  <copy/>
 	</string>
 
-    <string name="OptionalStringDefault" id="28" presence="optional">
+  <string name="OptionalStringDefault" id="28" presence="optional">
 	  <default value="OPTDEFVAL"/>
 	</string>
 
@@ -151,5 +151,15 @@
     </group>
 
   </template>
+
+  <template id="6" name="DeltaStringOperatorMessage">
+    <string name="MandatoryStringDelta" id="1">
+	     <delta/>
+    </string>
+  </template>
+
+
+
+
 
 </templates>

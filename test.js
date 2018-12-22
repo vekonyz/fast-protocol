@@ -85,6 +85,23 @@ testCodec([
   }
 ])
 
+
+testCodec([
+  {
+    name: "DeltaStringOperatorMessage",
+    msg: {MandatoryStringDelta: "Hello"}
+  },
+  {
+    name: "DeltaStringOperatorMessage",
+    msg: {MandatoryStringDelta: "Hello World"}
+  },
+  {
+    name: "DeltaStringOperatorMessage",
+    msg: {MandatoryStringDelta: "World"}
+  }
+])
+
+
 // test TestMessage
 testCodec([
   {
