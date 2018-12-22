@@ -19,20 +19,6 @@ function toHexString(byteArray) {
   return s;
 }
 
-var Type = {
-	MESSAGE: 0,
-	INT32: 1,
-	INT64: 2,
-	UINT32: 3,
-	UINT64: 4,
-	DECIMAL: 5,
-	STIRNG: 6,
-	BYTEVECTOR: 7,
-	SEQUENCE: 8,
-	GROUP: 9,
-	LENGTH: 10
-}
-
 var Operator = {
 	NONE: undefined,
 	CONSTANT: 1,
@@ -66,16 +52,8 @@ var State = {
 	EMPTY: 2
 }
 
-/*
-function OperatorSpec(name, value) {
-	this.name = name
-	this.value = value
-}
-*/
-
 // message template description
 function Element(name, type, id, presence, operator, elements) {
-	//console.log('Create', type, name, '(', id, ',', presence, ',', operator, ')')
 	this.name = name
 	this.type = type
 	this.id = id
@@ -95,8 +73,6 @@ function Element(name, type, id, presence, operator, elements) {
 			break
 		case 'sequence':
 			this.lengthField = Element.parseElement(undefined, elements[0], presence)
-			//console.log('SEQUENCE LENGTH:', lengthField)
-			//this.lengthField = new Element('TemplateID', 'uInt32', 0, 'mandatory', {name: 'copy', key: 'templateID', value: undefined}, undefined)
 			Element.parse(this, elements, 1)
 			break
 		case 'templateref':
@@ -140,7 +116,6 @@ Element.prototype.presenceBits = function() {
 }
 
 Element.parseElement = function(parent, element, presence) {
-	//console.log('ParseElement', element.attributes.name, element.name)
 	var operator = getOperator(element.elements)
 	var field = new Element(element.attributes.name, element.name, element.attributes.id, presence ? presence : element.attributes.presence, !operator ? undefined : {name: operator.name, key: !operator.attributes || !operator.attributes.key ? element.attributes.name : operator.attributes.key, value: !operator.attributes ? undefined : operator.attributes.value}, element.elements, parent)
 	field.pmap = field.presenceBits()
@@ -891,14 +866,10 @@ function Encoder(fileName) {
 			var tpl = new Element(templates[i].attributes.name, 'message', templates[i].attributes.id)
 			Element.parse(tpl, templates[i].elements)
 
-			//console.log(JSON.stringify(tpl, null, 2))
-
 			// add mapping for template id and name
 			this.templates[tpl.id] = tpl
 			this.templates[tpl.name] = tpl
 		}
-
-
 }
 
 Encoder.prototype.encode = function(name, value) {
@@ -916,8 +887,7 @@ Encoder.prototype.encode = function(name, value) {
 	// encode message body
 	this.encodeGroup(ctx, tpl, value)
 
-	//console.log('\n', name, '=', toHexString(ctx.buffer))
-
+	// return the binary encoded message
 	return ctx.buffer
 }
 

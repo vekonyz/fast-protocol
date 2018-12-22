@@ -50,6 +50,7 @@ function testCodec(messages) {
       }
       throw new Error('Decoded message does not match epected message')
     }
+    console.log('Info: ', messages[i].name, 'passed test')
     ++i
 
     //assert.deepEqual(messages[i].msg, msg, differences)
@@ -61,6 +62,8 @@ function testCodec(messages) {
     }*/
   })
 }
+
+console.log('Start testing fast-protocol encode/decode')
 
 // test RDPacketHeader
 testCodec([
@@ -174,3 +177,5 @@ testCodec([
     }
   }
 ])
+
+console.log('Test done.')
