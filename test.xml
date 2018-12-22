@@ -158,8 +158,14 @@
     </string>
   </template>
 
-
-
+  <template id="7" name="StringTestMessage">
+    <sequence name="StringArray">
+      <length name="NoStrings"/>
+      <string name="MandatoryStringDelta" id="1">
+        <delta/>
+      </string>
+    </sequence>
+  </template>
 
 
 </templates>

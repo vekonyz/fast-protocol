@@ -593,7 +593,7 @@ Decoder.prototype.decodeStringValue = function(ctx, field) {
 			} else {
 				var str = length == null ? '' : this.decodeString(false)
 				if (length < 0) {
-					entry.assign(str + entry.Value.substring(length * -1))
+					entry.assign(str + entry.Value.substring((length + 1) * -1))
 				} else if (length > 0) {
 					entry.assign(entry.Value.substring(0, entry.Value.length - length) + str)
 				} else { // length == 0
@@ -1370,7 +1370,7 @@ Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 	for (var i = value.length, j = dict.length; i > 0 && j > 0 && value.charCodeAt(i - 1) == dict.charCodeAt(j - 1); --i, --j) {}
 	var post = value.length - i
 
-	//var begin = ctx.buffer.length
+	//console.log('COMPARE, PRE:', pre, 'POST:', post)
 	if ( pre > 0 || post > 0 )
 	{
 		if (pre == post && pre == value.length) {
@@ -1378,11 +1378,11 @@ Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 			this.encodeI(ctx, 0, optional)
 			this.encodeString(ctx, "", false)
 		} else if ( pre < post ) {
-			//console.log('POST', post - dict.length, value.substring(0, value.length - post))
-			this.encodeI(ctx, post - dict.length, optional)
+			//console.log('POST', post - dict.length - 1, value.substring(0, value.length - post))
+			this.encodeI(ctx, post - dict.length - 1, optional)
 			this.encodeString(ctx, value.substring(0, value.length - post), false)
 		} else {
-			//console.log('PRE', dict.length - pre, value.substring(pre))
+			//console.log('PRE', dict.length - pre , value.substring(pre))
 			this.encodeI(ctx, dict.length - pre, optional)
 			this.encodeString(ctx, value.substring(pre), false)
 		}
@@ -1392,7 +1392,6 @@ Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 		this.encodeString(ctx, value, false)
 	}
 
-	//console.log('BUFF', toHexString(ctx.buffer.slice(begin)))
 	return this
 }
 

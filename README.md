@@ -1,6 +1,9 @@
 # fast-protocol
 
-**fast-protocol** is a javascript/node.js module providing encoder/decoder functions for FAST -> 'FIX Adapted for Streaming' protocol version 1.1. Currently the module is still in development, therefore not yet usable.
+**fast-protocol** is a javascript/node.js module providing encoder/decoder functions for FAST -> 'FIX Adapted for Streaming' protocol version 1.1.
+
+## Attention
+Currently the module is still in development, therefore not yet usable.
 
 ## Install
 

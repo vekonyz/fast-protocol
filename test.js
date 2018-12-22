@@ -69,6 +69,24 @@ function testCodec(messages) {
 
 console.log('Start testing fast-protocol encode/decode')
 
+testCodec([
+  {
+    name: "StringTestMessage",
+    msg: {
+      StringArray: [
+        {MandatoryStringDelta: "Hello"},
+        {MandatoryStringDelta: "Hello World"},
+        {MandatoryStringDelta: "Hello World"},
+        {MandatoryStringDelta: "World"},
+        {MandatoryStringDelta: "Hello World"},
+        {MandatoryStringDelta: "Hello World!"},
+        {MandatoryStringDelta: "!Hello World"}
+      ]
+    }
+  }
+])
+
+
 // test RDPacketHeader
 testCodec([
   {
