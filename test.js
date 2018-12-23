@@ -208,6 +208,72 @@ testCodec([
 
 testCodec([
   {
+    name: "UInt64TestMessage",
+    msg: {
+      UInt64Array: [
+        {
+          MandatoryUInt64: "1",
+          MandatoryUInt64Const: "18446744073709551615",
+          MandatoryUInt64Copy: "1",
+          MandatoryUInt64Default: "1",
+          MandatoryUInt64Increment: "1",
+          MandatoryUInt64Delta: "0",
+        },
+        {
+          MandatoryUInt64: "1000",
+          MandatoryUInt64Const: "18446744073709551615",
+          MandatoryUInt64Copy: "1",
+          MandatoryUInt64Default: "18446744073709551615",
+          MandatoryUInt64Increment: "0",
+          MandatoryUInt64Delta: "1",
+        },
+        {
+          MandatoryUInt64: "1000000",
+          MandatoryUInt64Const: "18446744073709551615",
+          MandatoryUInt64Copy: "18446744073709551615",
+          MandatoryUInt64Default: "0",
+          MandatoryUInt64Increment: "1",
+          MandatoryUInt64Delta: "18446744073709551615",
+        },
+        {
+          MandatoryUInt64: "1000000000",
+          MandatoryUInt64Const: "18446744073709551615",
+          MandatoryUInt64Copy: "18446744073709551615",
+          MandatoryUInt64Default: "1",
+          MandatoryUInt64Increment: "2",
+          MandatoryUInt64Delta: "0",
+        },
+        {
+          MandatoryUInt64: "1000000000000",
+          MandatoryUInt64Const: "18446744073709551615",
+          MandatoryUInt64Copy: "0",
+          MandatoryUInt64Default: "18446744073709551615",
+          MandatoryUInt64Increment: "18446744073709551613",
+          MandatoryUInt64Delta: "18446744073709551615",
+        },
+        {
+          MandatoryUInt64: "1000000000000000",
+          MandatoryUInt64Const: "18446744073709551615",
+          MandatoryUInt64Copy: "1",
+          MandatoryUInt64Default: "1",
+          MandatoryUInt64Increment: "18446744073709551614",
+          MandatoryUInt64Delta: "18446744073709551615",
+        },
+        {
+          MandatoryUInt64: "18446744073709551615",
+          MandatoryUInt64Const: "18446744073709551615",
+          MandatoryUInt64Copy: "2",
+          MandatoryUInt64Default: "0",
+          MandatoryUInt64Increment: "18446744073709551615",
+          MandatoryUInt64Delta: "0",
+        }
+      ]
+    }
+  }
+])
+
+testCodec([
+  {
     name: "StringTestMessage",
     msg: {
       StringArray: [
@@ -218,23 +284,6 @@ testCodec([
         {MandatoryStringDelta: "Hello World"},
         {MandatoryStringDelta: "Hello World!"},
         {MandatoryStringDelta: "!Hello World"}
-      ]
-    }
-  }
-])
-
-testCodec([
-  {
-    name: "UInt64TestMessage",
-    msg: {
-      UInt64Array: [
-        {MandatoryUInt64: "1"},
-        {MandatoryUInt64: "1000"},
-        {MandatoryUInt64: "1000000"},
-        {MandatoryUInt64: "1000000000"},
-        {MandatoryUInt64: "1000000000000"},
-        {MandatoryUInt64: "1000000000000000"},
-        {MandatoryUInt64: "18446744073709551615"}
       ]
     }
   }

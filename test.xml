@@ -187,10 +187,13 @@
 
   <template id="9" name="UInt64TestMessage">
     <sequence name="UInt64Array">
-      <length name="NoInteger"/>
-      <uInt64 name="MandatoryUInt64" id="1">
-        <!--delta/-->
-      </uInt64>
+      <length name="NoOfInteger"/>
+      <uInt64 name="MandatoryUInt64"></uInt64>
+      <uInt64 name="MandatoryUInt64Const"><constant value="18446744073709551615"/></uInt64>
+      <uInt64 name="MandatoryUInt64Copy"><copy/></uInt64>
+      <uInt64 name="MandatoryUInt64Default"><default value="18446744073709551615"/></uInt64>
+      <uInt64 name="MandatoryUInt64Increment"><increment/></uInt64>
+      <uInt64 name="MandatoryUInt64Delta"><delta/></uInt64>
     </sequence>
   </template>
 

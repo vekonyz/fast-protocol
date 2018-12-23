@@ -448,10 +448,10 @@ Decoder.prototype.decodeUInt64Value = function(ctx, field) {
 		case 'tail':
 			break
 		case 'delta':
-		var entry = this.Dictionary.getField(field.name)
-		var streamValue = this.decodeI64(optional)
-		entry.assign(streamValue == null ? undefined : entry.Value + streamValue)
-		return entry.Value
+			var entry = this.Dictionary.getField(field.name)
+			var streamValue = this.decodeI64(optional)
+			entry.assign(streamValue == null ? undefined : entry.isAssigned() ? Long.fromValue(entry.Value, true).add(streamValue) : streamValue)
+			return entry.isAssigned() ? entry.Value.toString(10) : undefined
 	}
 }
 
@@ -494,10 +494,10 @@ Decoder.prototype.decodeInt64Value = function(ctx, field) {
 		case 'tail':
 			break
 		case 'delta':
-		var entry = this.Dictionary.getField(field.name)
-		var streamValue = this.decodeI64(optional)
-		entry.assign(streamValue == null ? undefined : entry.isAssigned() ? Long.fromValue(entry.Value).add(streamValue) : streamValue)
-		return entry.isAssigned() ? entry.Value.toString(10) : undefined
+			var entry = this.Dictionary.getField(field.name)
+			var streamValue = this.decodeI64(optional)
+			entry.assign(streamValue == null ? undefined : entry.isAssigned() ? Long.fromValue(entry.Value).add(streamValue) : streamValue)
+			return entry.isAssigned() ? entry.Value.toString(10) : undefined
 	}
 }
 
@@ -1190,8 +1190,8 @@ Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
 			break
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
-			var deltaValue = value ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
-			this.encodeU64(ctx, deltaValue, optional)
+			var deltaValue = value != null ? value.subtract((entry.isAssigned() ? entry.Value : Long.ZERO)) : undefined
+			this.encodeI64(ctx, deltaValue, optional)
 			entry.assign(value)
 			break
 	}
