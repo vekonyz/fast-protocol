@@ -4,6 +4,14 @@ var diff = require('deep-diff')
 
 var logDebug = false
 
+function toHexString(byteArray) {
+  var s = '';
+  byteArray.forEach(function(byte) {
+    s += ('0' + (byte & 0xFF).toString(16)).slice(-2) + ' ';
+  });
+  return s;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // - encode provided messages
@@ -21,6 +29,8 @@ function testCodec(messages) {
     if (logDebug) console.log('Input message:', messages[i].msg)
     buffer = buffer.concat(encoder.encode(messages[i].name, messages[i].msg))
   }
+
+  if (logDebug) console.log('\n', toHexString(buffer), '\n')
 
   // decode buffer
   var decoder = new FastStream.Decoder('test.xml')
@@ -91,14 +101,78 @@ testCodec([
     name: "Int64TestMessage",
     msg: {
       Int64Array: [
-        {MandatoryInt64: "1"},
-        {MandatoryInt64: "1000"},
-        {MandatoryInt64: "1000000"},
-        {MandatoryInt64: "1000000000"},
-        {MandatoryInt64: "1000000000000"},
-        {MandatoryInt64: "1000000000000000"},
-        {MandatoryInt64: "-9223372036854775807"},
-        {MandatoryInt64: "9223372036854775807"}
+        {
+          MandatoryInt64: "1",
+          MandatoryInt64Const: "-9223372036854775807",
+          MandatoryInt64Copy: "9223372036854775807",
+          MandatoryInt64Default: "9223372036854775807",
+          MandatoryInt64Increment: "-9223372036854775807",
+          MandatoryInt64Delta: "-9223372036854775807",
+          OptionalInt64: undefined
+        },
+        {
+          MandatoryInt64: "1000",
+          MandatoryInt64Const: "-9223372036854775807",
+          MandatoryInt64Copy: "9223372036854775807",
+          MandatoryInt64Default: "-9223372036854775807",
+          MandatoryInt64Increment: "-9223372036854775806",
+          MandatoryInt64Delta: "9223372036854775807",
+          OptionalInt64: undefined
+        },
+        {
+          MandatoryInt64: "1000000",
+          MandatoryInt64Const: "-9223372036854775807",
+          MandatoryInt64Copy: "-9223372036854775807",
+          MandatoryInt64Default: "9223372036854775807",
+          MandatoryInt64Increment: "-1",
+          MandatoryInt64Delta: "-9223372036854775807",
+          OptionalInt64: undefined
+        },
+        {
+          MandatoryInt64: "1000000000",
+          MandatoryInt64Const: "-9223372036854775807",
+          MandatoryInt64Copy: "-9223372036854775807",
+          MandatoryInt64Default: "-9223372036854775807",
+          MandatoryInt64Increment: "0",
+          MandatoryInt64Delta: "1",
+          OptionalInt64: undefined
+        },
+        {
+          MandatoryInt64: "1000000000000",
+          MandatoryInt64Const: "-9223372036854775807",
+          MandatoryInt64Copy: "0",
+          MandatoryInt64Default: "0",
+          MandatoryInt64Increment: "1",
+          MandatoryInt64Delta: "0",
+          OptionalInt64: undefined
+        },
+        {
+          MandatoryInt64: "1000000000000000",
+          MandatoryInt64Const: "-9223372036854775807",
+          MandatoryInt64Copy: "9223372036854775807",
+          MandatoryInt64Default: "9223372036854775807",
+          MandatoryInt64Increment: "-1",
+          MandatoryInt64Delta: "-1",
+          OptionalInt64: undefined
+        },
+        {
+          MandatoryInt64: "-9223372036854775807",
+          MandatoryInt64Const: "-9223372036854775807",
+          MandatoryInt64Copy: "-9223372036854775807",
+          MandatoryInt64Default: "-9223372036854775807",
+          MandatoryInt64Increment: "9223372036854775807",
+          MandatoryInt64Delta: "9223372036854775807",
+          OptionalInt64: undefined
+        },
+        {
+          MandatoryInt64: "9223372036854775807",
+          MandatoryInt64Const: "-9223372036854775807",
+          MandatoryInt64Copy: "-1",
+          MandatoryInt64Default: "-1",
+          MandatoryInt64Increment: "0",
+          MandatoryInt64Delta: "-1",
+          OptionalInt64: undefined
+        }
       ]
     }
   }

@@ -169,10 +169,14 @@
 
   <template id="8" name="Int64TestMessage">
     <sequence name="Int64Array">
-      <length name="NoInteger"/>
-      <int64 name="MandatoryInt64" id="1">
-        <!--delta/-->
-      </int64>
+      <length name="NoOfInteger"/>
+      <int64 name="MandatoryInt64"></int64>
+      <int64 name="MandatoryInt64Const"><constant value="-9223372036854775807"/></int64>
+      <int64 name="MandatoryInt64Copy"><copy/></int64>
+      <int64 name="MandatoryInt64Default"><default value="-9223372036854775807"/></int64>
+      <int64 name="MandatoryInt64Increment"><increment/></int64>
+      <int64 name="MandatoryInt64Delta"><delta/></int64>
+      <int64 name="OptionalInt64" presence="optional"></int64>
     </sequence>
   </template>
 
@@ -184,5 +188,8 @@
       </uInt64>
     </sequence>
   </template>
+
+
+
 
 </templates>

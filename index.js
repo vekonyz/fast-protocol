@@ -488,16 +488,16 @@ Decoder.prototype.decodeInt64Value = function(ctx, field) {
 			if (ctx.isBitSet()) {
 				entry.assign(this.decodeI64(optional))
 			} else {
-				entry.assign(entry.Value + 1)
+				entry.assign(Long.fromValue(entry.Value).add(Long.ONE))
 			}
-			return entry.Value
+			return entry.Value.toString(10)
 		case 'tail':
 			break
 		case 'delta':
 		var entry = this.Dictionary.getField(field.name)
-		var streamValue = this.decodeI32(optional)
-		entry.assign(streamValue == null ? undefined : entry.Value + streamValue)
-		return entry.Value
+		var streamValue = this.decodeI64(optional)
+		entry.assign(streamValue == null ? undefined : entry.isAssigned() ? Long.fromValue(entry.Value).add(streamValue) : streamValue)
+		return entry.isAssigned() ? entry.Value.toString(10) : undefined
 	}
 }
 
@@ -904,10 +904,10 @@ Encoder.prototype.encodeGroup = function(ctx, field, value, start) {
 				this.encodeUInt32Value(ctx, element, value[fieldName])
 				break
 			case 'int64':
-				this.encodeInt64Value(ctx, element, value[fieldName])
+				this.encodeInt64Value(ctx, element, value[fieldName] != null ? Long.fromValue(value[fieldName]) : undefined)
 				break
 			case 'uInt64':
-				this.encodeUInt64Value(ctx, element, value[fieldName])
+				this.encodeUInt64Value(ctx, element, value[fieldName] != null ? Long.fromValue(value[fieldName], true) : undefined)
 				break
 			case 'decimal':
 				this.encodeDecimalValue(ctx, element, value[fieldName])
@@ -1081,7 +1081,7 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 		if (optional && !value) {
 			this.encodeNull(ctx)
 		} else {
-			this.encodeI64(ctx, Long.fromValue(value), optional)
+			this.encodeI64(ctx, value, optional)
 		}
 		return
 	}
@@ -1094,7 +1094,7 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 			break
 		case 'copy':
 			var entry = this.Dictionary.getField(field.name)
-			if (entry.isAssigned() && value == entry.Value) {
+			if (entry.isAssigned() && value.equals(entry.Value)) {
 				ctx.setBit(false)
 			} else {
 				ctx.setBit(true)
@@ -1103,7 +1103,7 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 			}
 			break
 		case 'default':
-			if (value != field.operator.value) {
+			if (value.notEquals(field.operator.value)) {
 				ctx.setBit(true)
 				this.encodeI64(ctx, value, optional)
 			} else {
@@ -1112,7 +1112,7 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 			break
 		case 'increment':
 			var entry = this.Dictionary.getField(field.name)
-			if (entry.isAssigned() && value == entry.Value + 1) {
+			if (entry.isAssigned() && value.equals(entry.Value.add(Long.ONE))) {
 				ctx.setBit(false)
 			} else {
 				ctx.setBit(true)
@@ -1124,7 +1124,7 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 			break
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
-			var deltaValue = value ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
+			var deltaValue = value != null ? value.subtract((entry.isAssigned() ? entry.Value : Long.ZERO)) : undefined
 			this.encodeI64(ctx, deltaValue, optional)
 			entry.assign(value)
 			break
@@ -1511,12 +1511,10 @@ Encoder.prototype.encodeI32 = function(ctx, value, optional)
 	//uint8_t * sign = m_stream;
 
 	for (var i = 0; i < size; ++i) {
-		//console.log('XXX', (value >> this.SHIFT[size - i]) & (i > 0 ? 0x7f : 0x3f))
 		ctx.buffer.push((value >> this.SHIFT[size - i]) & (i > 0 ? 0x7f : 0x7f))
 	}
 
 	// set stop bit
-	//console.log('SET STOP BIT', ctx.buffer[ctx.buffer.length - 1], ctx.buffer.length - 1)
 	ctx.buffer[ctx.buffer.length - 1] |= 0x80
 
 	// set sign
