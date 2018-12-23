@@ -218,6 +218,7 @@ testCodec([
           MandatoryUInt64Default: "1",
           MandatoryUInt64Increment: "1",
           MandatoryUInt64Delta: "0",
+          OptionalUInt64: undefined,
         },
         {
           MandatoryUInt64: "1000",
@@ -226,6 +227,7 @@ testCodec([
           MandatoryUInt64Default: "18446744073709551615",
           MandatoryUInt64Increment: "0",
           MandatoryUInt64Delta: "1",
+          OptionalUInt64: "0",
         },
         {
           MandatoryUInt64: "1000000",
@@ -234,6 +236,7 @@ testCodec([
           MandatoryUInt64Default: "0",
           MandatoryUInt64Increment: "1",
           MandatoryUInt64Delta: "18446744073709551615",
+          OptionalUInt64: undefined,
         },
         {
           MandatoryUInt64: "1000000000",
@@ -242,6 +245,7 @@ testCodec([
           MandatoryUInt64Default: "1",
           MandatoryUInt64Increment: "2",
           MandatoryUInt64Delta: "0",
+          OptionalUInt64: "18446744073709551614",
         },
         {
           MandatoryUInt64: "1000000000000",
@@ -250,6 +254,7 @@ testCodec([
           MandatoryUInt64Default: "18446744073709551615",
           MandatoryUInt64Increment: "18446744073709551613",
           MandatoryUInt64Delta: "18446744073709551615",
+          OptionalUInt64: undefined,
         },
         {
           MandatoryUInt64: "1000000000000000",
@@ -258,6 +263,7 @@ testCodec([
           MandatoryUInt64Default: "1",
           MandatoryUInt64Increment: "18446744073709551614",
           MandatoryUInt64Delta: "18446744073709551615",
+          OptionalUInt64: "1",
         },
         {
           MandatoryUInt64: "18446744073709551615",
@@ -266,6 +272,7 @@ testCodec([
           MandatoryUInt64Default: "0",
           MandatoryUInt64Increment: "18446744073709551615",
           MandatoryUInt64Delta: "0",
+          OptionalUInt64: "0",
         }
       ]
     }

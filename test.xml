@@ -194,6 +194,7 @@
       <uInt64 name="MandatoryUInt64Default"><default value="18446744073709551615"/></uInt64>
       <uInt64 name="MandatoryUInt64Increment"><increment/></uInt64>
       <uInt64 name="MandatoryUInt64Delta"><delta/></uInt64>
+      <uInt64 name="OptionalUInt64" presence="optional"></uInt64>
     </sequence>
   </template>
 

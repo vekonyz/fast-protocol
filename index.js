@@ -698,15 +698,17 @@ Decoder.prototype.decodeU64 = function(optional) {
 		}
 	}
 
-	var val = Long.UZERO
+	var value = Long.UZERO
 	//console.log('Decoding', this.buffer.length - this.pos, 'bytes')
 	for (; this.pos < this.buffer.length; ) {
 		var byteVal = this.buffer[this.pos++]
-		val = val.shiftLeft(7).or(byteVal & 0x7f)
+		value = value.shiftLeft(7).or(byteVal & 0x7f)
 		if (byteVal & 0x80) break
 	}
 
-	return val.toString(10)
+	if (optional) value = value.subtract(Long.UONE)
+
+	return value.toString(10)
 }
 
 Decoder.prototype.decodeDecimal = function(optional) {
@@ -1190,7 +1192,7 @@ Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
 			break
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
-			var deltaValue = value != null ? value.subtract((entry.isAssigned() ? entry.Value : Long.ZERO)) : undefined
+			var deltaValue = value != null ? value.subtract((entry.isAssigned() ? entry.Value : Long.UZERO)) : undefined
 			this.encodeI64(ctx, deltaValue, optional)
 			entry.assign(value)
 			break
@@ -1483,12 +1485,14 @@ Encoder.prototype.encodeU32 = function(ctx, value, optional)
 	return this
 }
 
-Encoder.prototype.encodeU64 = function(ctx, value, optional)
+Encoder.prototype.encodeU64 = function(ctx, valueIn, optional)
 {
 	//console.log('encodeU64:', value.toString(10))
-	if (optional && value == null) {
+	if (optional && valueIn == null) {
 		this.encodeNull(ctx)
 	} else {
+		var value = optional ? valueIn.add(Long.UONE) : valueIn
+
 		//console.log('EncodeU', value)
 		var size = this.getSizeU64(value)
 		for (var i = 0; i < size; ++i) {
