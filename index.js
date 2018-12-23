@@ -490,7 +490,7 @@ Decoder.prototype.decodeInt64Value = function(ctx, field) {
 			} else {
 				entry.assign(Long.fromValue(entry.Value).add(Long.ONE))
 			}
-			return entry.Value.toString(10)
+			return entry.isAssigned() ? entry.Value.toString(10) : undefined
 		case 'tail':
 			break
 		case 'delta':
@@ -1118,7 +1118,10 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 			break
 		case 'increment':
 			var entry = this.Dictionary.getField(field.name)
-			if (entry.isAssigned() && value.equals(entry.Value.add(Long.ONE))) {
+			if (optional && !value) {
+				ctx.setBit(true)
+				this.encodeNull(ctx)
+			} else if (entry.isAssigned() && value.equals(entry.Value.add(Long.ONE))) {
 				ctx.setBit(false)
 			} else {
 				ctx.setBit(true)

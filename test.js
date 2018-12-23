@@ -100,6 +100,7 @@ testCodec([
           OptionalInt64Const: undefined,
           OptionalInt64Copy: undefined,
           OptionalInt64Default: undefined,
+          OptionalInt64Increment: undefined,
         },
         {
           MandatoryInt64: "1000",
@@ -112,6 +113,7 @@ testCodec([
           OptionalInt64Const: "-9223372036854775807",
           OptionalInt64Copy: undefined,
           OptionalInt64Default: "9223372036854775806",
+          OptionalInt64Increment: "0",
         },
         {
           MandatoryInt64: "1000000",
@@ -124,6 +126,7 @@ testCodec([
           OptionalInt64Const: undefined,
           OptionalInt64Copy: undefined,
           OptionalInt64Default: undefined,
+          OptionalInt64Increment: undefined,
         },
         {
           MandatoryInt64: "1000000000",
@@ -136,6 +139,7 @@ testCodec([
           OptionalInt64Const: "-9223372036854775807",
           OptionalInt64Copy: undefined,
           OptionalInt64Default: "1",
+          OptionalInt64Increment: "-1",
         },
         {
           MandatoryInt64: "1000000000000",
@@ -148,6 +152,7 @@ testCodec([
           OptionalInt64Const: undefined,
           OptionalInt64Copy: undefined,
           OptionalInt64Default: "0",
+          OptionalInt64Increment: "0",
         },
         {
           MandatoryInt64: "1000000000000000",
@@ -160,6 +165,7 @@ testCodec([
           OptionalInt64Const: "-9223372036854775807",
           OptionalInt64Copy: undefined,
           OptionalInt64Default: "-1",
+          OptionalInt64Increment: "1",
         },
         {
           MandatoryInt64: "-9223372036854775807",
@@ -172,6 +178,7 @@ testCodec([
           OptionalInt64Const: undefined,
           OptionalInt64Copy: undefined,
           OptionalInt64Default: "9223372036854775806",
+          OptionalInt64Increment: "-9223372036854775807",
         },
         {
           MandatoryInt64: "9223372036854775807",
@@ -184,6 +191,7 @@ testCodec([
           OptionalInt64Const: "-9223372036854775807",
           OptionalInt64Copy: undefined,
           OptionalInt64Default: undefined,
+          OptionalInt64Increment: "-9223372036854775806",
         }
       ]
     }

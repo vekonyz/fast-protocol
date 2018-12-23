@@ -180,6 +180,7 @@
       <int64 name="OptionalInt64Const" presence="optional"><constant value="-9223372036854775807"/></int64>
       <int64 name="OptionalInt64Copy" presence="optional"><copy/></int64>
       <int64 name="OptionalInt64Default" presence="optional"><default value="9223372036854775806"/></int64>
+      <int64 name="OptionalInt64Increment" presence="optional"><increment/></int64>
     </sequence>
   </template>
 
