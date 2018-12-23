@@ -195,6 +195,11 @@
       <uInt64 name="MandatoryUInt64Increment"><increment/></uInt64>
       <uInt64 name="MandatoryUInt64Delta"><delta/></uInt64>
       <uInt64 name="OptionalUInt64" presence="optional"></uInt64>
+      <uInt64 name="OptionalUInt64Const" presence="optional"><constant value="18446744073709551615"/></uInt64>
+      <uInt64 name="OptionalUInt64Copy" presence="optional"><copy/></uInt64>
+      <uInt64 name="OptionalUInt64Default" presence="optional"><default value="18446744073709551615"/></uInt64>
+      <uInt64 name="OptionalUInt64Incremental" presence="optional"><incremental/></uInt64>
+      <uInt64 name="OptionalUInt64Delta" presence="optional"><delta/></uInt64>
     </sequence>
   </template>
 

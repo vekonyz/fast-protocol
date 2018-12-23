@@ -1193,7 +1193,7 @@ Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
 			var deltaValue = value != null ? value.subtract((entry.isAssigned() ? entry.Value : Long.UZERO)) : undefined
-			this.encodeI64(ctx, deltaValue, optional)
+			this.encodeI64(ctx, deltaValue == null ? undefined : deltaValue.toSigned(), optional)
 			entry.assign(value)
 			break
 	}
