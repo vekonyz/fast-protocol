@@ -1107,6 +1107,7 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 			break
 		case 'default':
 			if (optional && !value) {
+				ctx.setBit(true)
 				this.encodeNull(ctx)
 			} else if (value.notEquals(field.operator.value)) {
 				ctx.setBit(true)

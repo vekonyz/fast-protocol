@@ -99,7 +99,7 @@ testCodec([
           OptionalInt64: undefined,
           OptionalInt64Const: undefined,
           OptionalInt64Copy: undefined,
-          OptionalInt64Default: "1",
+          OptionalInt64Default: undefined,
         },
         {
           MandatoryInt64: "1000",
@@ -111,7 +111,7 @@ testCodec([
           OptionalInt64: "1",
           OptionalInt64Const: "-9223372036854775807",
           OptionalInt64Copy: undefined,
-          OptionalInt64Default: "1",
+          OptionalInt64Default: "9223372036854775806",
         },
         {
           MandatoryInt64: "1000000",
@@ -123,7 +123,7 @@ testCodec([
           OptionalInt64: undefined,
           OptionalInt64Const: undefined,
           OptionalInt64Copy: undefined,
-          OptionalInt64Default: "1",
+          OptionalInt64Default: undefined,
         },
         {
           MandatoryInt64: "1000000000",
@@ -147,7 +147,7 @@ testCodec([
           OptionalInt64: "-9223372036854775807",
           OptionalInt64Const: undefined,
           OptionalInt64Copy: undefined,
-          OptionalInt64Default: "1",
+          OptionalInt64Default: "0",
         },
         {
           MandatoryInt64: "1000000000000000",
@@ -159,7 +159,7 @@ testCodec([
           OptionalInt64: undefined,
           OptionalInt64Const: "-9223372036854775807",
           OptionalInt64Copy: undefined,
-          OptionalInt64Default: "1",
+          OptionalInt64Default: "-1",
         },
         {
           MandatoryInt64: "-9223372036854775807",
@@ -171,7 +171,7 @@ testCodec([
           OptionalInt64: "9223372036854775806",
           OptionalInt64Const: undefined,
           OptionalInt64Copy: undefined,
-          OptionalInt64Default: "1",
+          OptionalInt64Default: "9223372036854775806",
         },
         {
           MandatoryInt64: "9223372036854775807",
@@ -183,7 +183,7 @@ testCodec([
           OptionalInt64: "0",
           OptionalInt64Const: "-9223372036854775807",
           OptionalInt64Copy: undefined,
-          OptionalInt64Default: "1",
+          OptionalInt64Default: undefined,
         }
       ]
     }
