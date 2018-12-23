@@ -5,12 +5,21 @@ var diff = require('deep-diff')
 var logDebug = false
 
 function toHexString(byteArray) {
-  var s = '';
+  var s = ''
   byteArray.forEach(function(byte) {
-    s += ('0' + (byte & 0xFF).toString(16)).slice(-2) + ' ';
-  });
-  return s;
+    s += ('0' + (byte & 0xFF).toString(16)).slice(-2) + ' '
+  })
+  return s
 }
+
+function join(array) {
+  var s = ''
+  array.forEach(function(token) {
+    s += (token === parseInt(token, 10)) ? '[' + token + ']' : (s.length ? '.' : '') + token
+  })
+  return s
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -41,24 +50,19 @@ function testCodec(messages) {
 
     var differences = diff(messages[i].msg, msg)
     if (differences != null) {
-      //console.log(differences)
       for (var d = 0; d < differences.length; ++d) {
         switch (differences[d].kind) {
           case 'N': // indicates a newly added property/element
-            console.log('Error: Additional property found:', messages[i].name, '.', differences[d].path.join('.'))
+            console.log('Error: Additional property found:', messages[i].name, '.', join(differences[d].path))
             break
           case 'D': // indicates a property/element was deleted
-            console.log('Error: Property ', messages[i].name, '.', differences[d].path.join('.'), 'missing')
+            console.log('Error: Property ', messages[i].name, '.', join(differences[d].path), 'missing')
             break
           case 'E': // indicates a property/element was changed
-            if ( (differences[d].path.length) > 1 && (differences[d].path[differences[d].path.length - 1] === parseInt(differences[d].path[differences[d].path.length - 1], 10)) ) {
-              console.log('Error: Property value', messages[i].name, '.', differences[d].slice(0, differences[d].path.length - 1).join('.'), '[', differences[d].path[differences[d].path.length - 1], ']', 'differs:', differences[d].lhs, '<>', differences[d].rhs)
-            } else {
-              console.log('Error: Property value', messages[i].name, '.', differences[d].path.join('.'), 'differs:', differences[d].lhs, '<>', differences[d].rhs)
-            }
+            console.log('Error: Property value', messages[i].name, '.', join(differences[d].path), 'differs:', differences[d].lhs, '<>', differences[d].rhs)
             break
           case 'A': // indicates a change occurred within an array
-            console.log('Error: Array content ', messages[i].name, '.', differences[d].path.join('.'), 'differs:', differences[d].lhs, '<>', differences[d].rhs)
+            console.log('Error: Array content ', messages[i].name, '.', join(differences[d].path), 'differs:', differences[d].lhs, '<>', differences[d].rhs)
             break
         }
       }
@@ -79,22 +83,6 @@ function testCodec(messages) {
 
 console.log('Start testing fast-protocol encode/decode')
 
-testCodec([
-  {
-    name: "StringTestMessage",
-    msg: {
-      StringArray: [
-        {MandatoryStringDelta: "Hello"},
-        {MandatoryStringDelta: "Hello World"},
-        {MandatoryStringDelta: "Hello World"},
-        {MandatoryStringDelta: "World"},
-        {MandatoryStringDelta: "Hello World"},
-        {MandatoryStringDelta: "Hello World!"},
-        {MandatoryStringDelta: "!Hello World"}
-      ]
-    }
-  }
-])
 
 testCodec([
   {
@@ -108,7 +96,10 @@ testCodec([
           MandatoryInt64Default: "9223372036854775807",
           MandatoryInt64Increment: "-9223372036854775807",
           MandatoryInt64Delta: "-9223372036854775807",
-          OptionalInt64: undefined
+          OptionalInt64: undefined,
+          OptionalInt64Const: undefined,
+          OptionalInt64Copy: undefined,
+          OptionalInt64Default: "1",
         },
         {
           MandatoryInt64: "1000",
@@ -117,7 +108,10 @@ testCodec([
           MandatoryInt64Default: "-9223372036854775807",
           MandatoryInt64Increment: "-9223372036854775806",
           MandatoryInt64Delta: "9223372036854775807",
-          OptionalInt64: "1"
+          OptionalInt64: "1",
+          OptionalInt64Const: "-9223372036854775807",
+          OptionalInt64Copy: undefined,
+          OptionalInt64Default: "1",
         },
         {
           MandatoryInt64: "1000000",
@@ -126,7 +120,10 @@ testCodec([
           MandatoryInt64Default: "9223372036854775807",
           MandatoryInt64Increment: "-1",
           MandatoryInt64Delta: "-9223372036854775807",
-          OptionalInt64: undefined
+          OptionalInt64: undefined,
+          OptionalInt64Const: undefined,
+          OptionalInt64Copy: undefined,
+          OptionalInt64Default: "1",
         },
         {
           MandatoryInt64: "1000000000",
@@ -135,7 +132,10 @@ testCodec([
           MandatoryInt64Default: "-9223372036854775807",
           MandatoryInt64Increment: "0",
           MandatoryInt64Delta: "1",
-          OptionalInt64: "-1"
+          OptionalInt64: "-1",
+          OptionalInt64Const: "-9223372036854775807",
+          OptionalInt64Copy: undefined,
+          OptionalInt64Default: "1",
         },
         {
           MandatoryInt64: "1000000000000",
@@ -144,7 +144,10 @@ testCodec([
           MandatoryInt64Default: "0",
           MandatoryInt64Increment: "1",
           MandatoryInt64Delta: "0",
-          OptionalInt64: "-9223372036854775807"
+          OptionalInt64: "-9223372036854775807",
+          OptionalInt64Const: undefined,
+          OptionalInt64Copy: undefined,
+          OptionalInt64Default: "1",
         },
         {
           MandatoryInt64: "1000000000000000",
@@ -153,7 +156,10 @@ testCodec([
           MandatoryInt64Default: "9223372036854775807",
           MandatoryInt64Increment: "-1",
           MandatoryInt64Delta: "-1",
-          OptionalInt64: undefined
+          OptionalInt64: undefined,
+          OptionalInt64Const: "-9223372036854775807",
+          OptionalInt64Copy: undefined,
+          OptionalInt64Default: "1",
         },
         {
           MandatoryInt64: "-9223372036854775807",
@@ -162,7 +168,10 @@ testCodec([
           MandatoryInt64Default: "-9223372036854775807",
           MandatoryInt64Increment: "9223372036854775807",
           MandatoryInt64Delta: "9223372036854775807",
-          OptionalInt64: "9223372036854775806"
+          OptionalInt64: "9223372036854775806",
+          OptionalInt64Const: undefined,
+          OptionalInt64Copy: undefined,
+          OptionalInt64Default: "1",
         },
         {
           MandatoryInt64: "9223372036854775807",
@@ -171,8 +180,28 @@ testCodec([
           MandatoryInt64Default: "-1",
           MandatoryInt64Increment: "0",
           MandatoryInt64Delta: "-1",
-          OptionalInt64: "0"
+          OptionalInt64: "0",
+          OptionalInt64Const: "-9223372036854775807",
+          OptionalInt64Copy: undefined,
+          OptionalInt64Default: "1",
         }
+      ]
+    }
+  }
+])
+
+testCodec([
+  {
+    name: "StringTestMessage",
+    msg: {
+      StringArray: [
+        {MandatoryStringDelta: "Hello"},
+        {MandatoryStringDelta: "Hello World"},
+        {MandatoryStringDelta: "Hello World"},
+        {MandatoryStringDelta: "World"},
+        {MandatoryStringDelta: "Hello World"},
+        {MandatoryStringDelta: "Hello World!"},
+        {MandatoryStringDelta: "!Hello World"}
       ]
     }
   }

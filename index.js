@@ -1096,6 +1096,7 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 			break
 		case 'copy':
 			var entry = this.Dictionary.getField(field.name)
+			//if (optional) console.log('ENCODE INT64:', value, entry)
 			if (entry.isAssigned() && value.equals(entry.Value)) {
 				ctx.setBit(false)
 			} else {
@@ -1105,7 +1106,9 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 			}
 			break
 		case 'default':
-			if (value.notEquals(field.operator.value)) {
+			if (optional && !value) {
+				this.encodeNull(ctx)
+			} else if (value.notEquals(field.operator.value)) {
 				ctx.setBit(true)
 				this.encodeI64(ctx, value, optional)
 			} else {
@@ -1531,6 +1534,7 @@ Encoder.prototype.encodeI32 = function(ctx, value, optional)
 
 Encoder.prototype.encodeI64 = function(ctx, valueIn, optional)
 {
+	//console.log('ENCODE I64', valueIn, optional)
 	if (optional && valueIn == null) {
 		this.encodeNull(ctx)
 		return this
