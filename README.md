@@ -1,5 +1,7 @@
 # fast-protocol
 
+[![Build Status](https://travis-ci.com/vekonyz/fast-protocol.svg?branch=master)](https://travis-ci.com/vekonyz/fast-protocol)
+
 **fast-protocol** is a javascript/node.js module providing encoder/decoder functions for FAST -> 'FIX Adapted for Streaming' protocol version 1.1.
 
 ## Attention
