@@ -285,11 +285,9 @@ Decoder.prototype.decode = function(buffer, callbacks) {
 
 		// decode presence map
 		var ctx = new Context(this.decodePMAP())
-		//console.log('DECODED PMAP', ctx.pmap)
 
 		// decode template id
 		this.TemplateID = this.decodeUInt32Value(ctx, this.templateID)
-		//if (ctx.isBitSet()) this.TemplateID = this.decodeU32(false)
 
 		// lookup template definition
 		var tpl = this.templates[this.TemplateID]
@@ -451,14 +449,14 @@ Decoder.prototype.decodeUInt64Value = function(ctx, field) {
 			break
 		case 'delta':
 		var entry = this.Dictionary.getField(field.name)
-		var streamValue = this.decodeI32(optional)
+		var streamValue = this.decodeI64(optional)
 		entry.assign(streamValue == null ? undefined : entry.Value + streamValue)
 		return entry.Value
 	}
 }
 
 Decoder.prototype.decodeInt64Value = function(ctx, field) {
-	console.log('DecodeInt64Value', field.name, field.isOptional(), field.operator)
+	//console.log('DecodeInt64Value', field.name, field.isOptional(), field.operator)
 	var optional = field.isOptional()
 	if (!field.hasOperator()) return this.decodeI64(optional)
 
@@ -698,11 +696,10 @@ Decoder.prototype.decodeU64 = function(optional) {
 		}
 	}
 
-	var val = Long.ZERO
+	var val = Long.UZERO
 	//console.log('Decoding', this.buffer.length - this.pos, 'bytes')
 	for (; this.pos < this.buffer.length; ) {
 		var byteVal = this.buffer[this.pos++]
-		//console.log('Byte:', byteVal & 0x7f)
 		val = val.shiftLeft(7).or(byteVal & 0x7f)
 		if (byteVal & 0x80) break
 	}
@@ -799,20 +796,13 @@ Decoder.prototype.decodeGroup = function(ctx, elements, start) {
 				//console.log(fieldName, '=', val[fieldName])
 				break
 			case 'group':
-				//logInfo = true
 				var isBitSet = optional ? ctx.isBitSet() : false
-				//console.log('DECODE GROUP', fieldName, 'OPT:', optional, 'BIT_SET:', isBitSet, 'ELEMENT_PMAP:', element.pmapElements)
-				//if ((!optional) || (optional && ctx.isBitSet())) {
 				if ((!optional) || (optional && isBitSet)) {
 					var groupCtx = new Context(element.pmapElements > 0 ? this.decodePMAP() : [])
-					//val[fieldName + 'Context'] = groupCtx
-					//val[fieldName + 'PMAP'] = element.pmapElements
-					//val[fieldName + 'Elements'] = element.elements.length
 					val[fieldName] = this.decodeGroup(groupCtx, element.elements)
 				} else {
 					val[fieldName] = undefined
 				}
-				//logInfo = false
 				break
 			case 'sequence':
 				val[fieldName] = this.decodeSequenceValue(ctx, element)
@@ -917,7 +907,7 @@ Encoder.prototype.encodeGroup = function(ctx, field, value, start) {
 				this.encodeInt64Value(ctx, element, value[fieldName])
 				break
 			case 'uInt64':
-				//this.encodeUInt64Value(ctx, element, value[fieldName])
+				this.encodeUInt64Value(ctx, element, value[fieldName])
 				break
 			case 'decimal':
 				this.encodeDecimalValue(ctx, element, value[fieldName])
@@ -1085,7 +1075,7 @@ Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
 }
 
 Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
-	console.log('EncodeUInt32Value:', field.name, value, 'OPT:', field.isOptional(), 'HAS_OP:', field.hasOperator())
+	//console.log('EncodeUInt64Value:', field.name, value, 'OPT:', field.isOptional(), 'HAS_OP:', field.hasOperator())
 	var optional = field.isOptional()
 	if (!field.hasOperator()) {
 		if (optional && !value) {
@@ -1136,6 +1126,63 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 			var entry = this.Dictionary.getField(field.name)
 			var deltaValue = value ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
 			this.encodeI64(ctx, deltaValue, optional)
+			entry.assign(value)
+			break
+	}
+}
+
+Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
+	//console.log('EncodeUInt64Value:', field.name, value, 'OPT:', field.isOptional(), 'HAS_OP:', field.hasOperator())
+	var optional = field.isOptional()
+	if (!field.hasOperator()) {
+		if (optional && !value) {
+			this.encodeNull(ctx)
+		} else {
+			this.encodeU64(ctx, Long.fromValue(value, true), optional)
+		}
+		return
+	}
+
+	switch (field.operator.name) {
+		case 'constant':
+			if (optional) {
+				ctx.setBit(value != null)
+			}
+			break
+		case 'copy':
+			var entry = this.Dictionary.getField(field.name)
+			if (entry.isAssigned() && value == entry.Value) {
+				ctx.setBit(false)
+			} else {
+				ctx.setBit(true)
+				this.encodeU64(ctx, value, optional)
+				entry.assign(value)
+			}
+			break
+		case 'default':
+			if (value != field.operator.value) {
+				ctx.setBit(true)
+				this.encodeU64(ctx, value, optional)
+			} else {
+				ctx.setBit(false)
+			}
+			break
+		case 'increment':
+			var entry = this.Dictionary.getField(field.name)
+			if (entry.isAssigned() && value == entry.Value + 1) {
+				ctx.setBit(false)
+			} else {
+				ctx.setBit(true)
+				this.encodeU64(ctx, value, optional)
+			}
+			entry.assign(value)
+			break
+		case 'tail':
+			break
+		case 'delta':
+			var entry = this.Dictionary.getField(field.name)
+			var deltaValue = value ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
+			this.encodeU64(ctx, deltaValue, optional)
 			entry.assign(value)
 			break
 	}
@@ -1328,16 +1375,18 @@ Encoder.prototype.getSizeU64 = function(value)
 	const L4398046511104 = Long.fromString("4398046511104", true)
 	const L562949953421312 = Long.fromString("562949953421312", true)
 	const L72057594037927936 = Long.fromString("72057594037927936", true)
+	const L9223372036854775808 = Long.fromString("9223372036854775808", true)
 
-	if (value.lessThan(L128))								return 1; // 2 ^ 7
-	if (value.lessThan(L16384))							return 2; // 2 ^ 14
-	if (value.lessThan(L2097152))						return 3; // 2 ^ 21
-	if (value.lessThan(L268435456))					return 4; // 2 ^ 28
-	if (value.lessThan(L34359738368))				return 5; // 2 ^ 35
-	if (value.lessThan(L4398046511104))			return 6; // 2 ^ 42
-	if (value.lessThan(L562949953421312))		return 7; // 2 ^ 49
-	if (value.lessThan(L72057594037927936))	return 8; // 2 ^ 56
-	return 9;
+	if (value.lessThan(L128)) return 1; // 2 ^ 7
+	if (value.lessThan(L16384)) return 2; // 2 ^ 14
+	if (value.lessThan(L2097152)) return 3; // 2 ^ 21
+	if (value.lessThan(L268435456)) return 4; // 2 ^ 28
+	if (value.lessThan(L34359738368)) return 5; // 2 ^ 35
+	if (value.lessThan(L4398046511104)) return 6; // 2 ^ 42
+	if (value.lessThan(L562949953421312)) return 7; // 2 ^ 49
+	if (value.lessThan(L72057594037927936)) return 8; // 2 ^ 56
+	if (value.lessThan(L9223372036854775808))	return 9; // 2 ^ 63
+	return 10;
 }
 
 Encoder.prototype.getSizeI32 = function(value)
@@ -1427,6 +1476,7 @@ Encoder.prototype.encodeU32 = function(ctx, value, optional)
 
 Encoder.prototype.encodeU64 = function(ctx, value, optional)
 {
+	//console.log('encodeU64:', value.toString(10))
 	if (optional && value == null) {
 		this.encodeNull(ctx)
 	} else {
@@ -1434,7 +1484,7 @@ Encoder.prototype.encodeU64 = function(ctx, value, optional)
 		var size = this.getSizeU64(value)
 		for (var i = 0; i < size; ++i) {
 			//ctx.buffer.push((value >> this.SHIFT[size - i]) & 0x7f)
-			ctx.buffer.push((value.shiftRight(this.SHIFT[size - i]).getLowBitsUnsigned() & 0x7f))
+			ctx.buffer.push((value.shiftRightUnsigned(this.SHIFT[size - i]).getLowBitsUnsigned() & 0x7f))
 		}
 
 		// set stop bit

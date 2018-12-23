@@ -2,7 +2,7 @@ var FastStream = require('./index.js')
 //var assert = require('assert');
 var diff = require('deep-diff')
 
-var logDebug = true
+var logDebug = false
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -52,7 +52,7 @@ function testCodec(messages) {
             break
         }
       }
-      throw new Error('Decoded message does not match epected message')
+      throw new Error('Decoded message does not match expected message')
     }
     console.log('Info: ', messages[i].name, 'passed test')
     ++i
@@ -96,7 +96,26 @@ testCodec([
         {MandatoryInt64: "1000000"},
         {MandatoryInt64: "1000000000"},
         {MandatoryInt64: "1000000000000"},
-        {MandatoryInt64: "1000000000000000"}
+        {MandatoryInt64: "1000000000000000"},
+        {MandatoryInt64: "-9223372036854775807"},
+        {MandatoryInt64: "9223372036854775807"}
+      ]
+    }
+  }
+])
+
+testCodec([
+  {
+    name: "UInt64TestMessage",
+    msg: {
+      UInt64Array: [
+        {MandatoryUInt64: "1"},
+        {MandatoryUInt64: "1000"},
+        {MandatoryUInt64: "1000000"},
+        {MandatoryUInt64: "1000000000"},
+        {MandatoryUInt64: "1000000000000"},
+        {MandatoryUInt64: "1000000000000000"},
+        {MandatoryUInt64: "18446744073709551615"}
       ]
     }
   }
@@ -196,18 +215,17 @@ testCodec([
 ])
 
 // test DecimalMessage
-/*
 testCodec([
   {
     name: "DecimalMessage",
     msg: {
-      MandatoryDecimal: {m: 1, e: 0},
-      MandatoryDecimalCopy: {m: 3, e: -2},
-      OptionalDecimal: {m: 2, e: -1},
+      MandatoryDecimal: {m: "1", e: 0},
+      MandatoryDecimalCopy: {m: "3", e: -2},
+      OptionalDecimal: {m: "2", e: -1},
     }
   }
 ])
-*/
+
 
 // test SequenceMessage
 testCodec([

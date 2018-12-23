@@ -176,5 +176,13 @@
     </sequence>
   </template>
 
+  <template id="9" name="UInt64TestMessage">
+    <sequence name="UInt64Array">
+      <length name="NoInteger"/>
+      <uInt64 name="MandatoryUInt64" id="1">
+        <!--delta/-->
+      </uInt64>
+    </sequence>
+  </template>
 
 </templates>
