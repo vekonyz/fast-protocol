@@ -675,15 +675,17 @@ Decoder.prototype.decodeI64 = function(optional) {
 	}
 
 	//var val = (this.buffer[this.pos] & 0x40) > 0 ? -1 : 0
-	var val = Long.fromInt((this.buffer[this.pos] & 0x40) > 0 ? -1 : 0)
+	var value = Long.fromInt((this.buffer[this.pos] & 0x40) > 0 ? -1 : 0)
 	for (; this.pos < this.buffer.length; ) {
 		var byteVal = this.buffer[this.pos++]
 		//val = (val << 7) + (byteVal & 0x7f)
-		val = val.shiftLeft(7).or(byteVal & 0x7f)
+		value = value.shiftLeft(7).or(byteVal & 0x7f)
 		if (byteVal & 0x80) break
 	}
 
-	return val.toString(10)
+	if (optional && value.greaterThan(Long.ZERO)) value = value.subtract(Long.ONE)
+
+	return value.toString(10)
 }
 
 Decoder.prototype.decodeU64 = function(optional) {
@@ -1527,17 +1529,20 @@ Encoder.prototype.encodeI32 = function(ctx, value, optional)
 	return this
 }
 
-Encoder.prototype.encodeI64 = function(ctx, value, optional)
+Encoder.prototype.encodeI64 = function(ctx, valueIn, optional)
 {
-	if (optional && value == null) {
+	if (optional && valueIn == null) {
 		this.encodeNull(ctx)
 		return this
 	}
 
+	var value = (optional && valueIn.greaterThanOrEqual(Long.ZERO)) ? valueIn.add(Long.ONE) : valueIn
+
 	//var SIGN_SHIFT = (sizeof(T) * 8 - 7);
+	/*
 	if (optional && value.greaterThanOrEqual(Long.ZERO)) {
 		value = value.add(Long.ONE)
-	}
+	}*/
 
 	var size = this.getSizeI64(value);
 	var sign = ctx.buffer.length - 1
