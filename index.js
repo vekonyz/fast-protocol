@@ -1077,7 +1077,7 @@ Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
 }
 
 Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
-	//console.log('EncodeUInt64Value:', field.name, value, 'OPT:', field.isOptional(), 'HAS_OP:', field.hasOperator())
+	//console.log('EncodeInt64Value:', field.name, value, 'OPT:', field.isOptional(), 'HAS_OP:', field.hasOperator())
 	var optional = field.isOptional()
 	if (!field.hasOperator()) {
 		if (optional && !value) {

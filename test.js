@@ -101,6 +101,7 @@ testCodec([
           OptionalInt64Copy: undefined,
           OptionalInt64Default: undefined,
           OptionalInt64Increment: undefined,
+          OptionalInt64Delta: undefined,
         },
         {
           MandatoryInt64: "1000",
@@ -114,6 +115,7 @@ testCodec([
           OptionalInt64Copy: undefined,
           OptionalInt64Default: "9223372036854775806",
           OptionalInt64Increment: "0",
+          OptionalInt64Delta: "0",
         },
         {
           MandatoryInt64: "1000000",
@@ -127,6 +129,7 @@ testCodec([
           OptionalInt64Copy: undefined,
           OptionalInt64Default: undefined,
           OptionalInt64Increment: undefined,
+          OptionalInt64Delta: undefined,
         },
         {
           MandatoryInt64: "1000000000",
@@ -140,6 +143,7 @@ testCodec([
           OptionalInt64Copy: undefined,
           OptionalInt64Default: "1",
           OptionalInt64Increment: "-1",
+          OptionalInt64Delta: "-9223372036854775807",
         },
         {
           MandatoryInt64: "1000000000000",
@@ -153,6 +157,7 @@ testCodec([
           OptionalInt64Copy: undefined,
           OptionalInt64Default: "0",
           OptionalInt64Increment: "0",
+          OptionalInt64Delta: "9223372036854775806",
         },
         {
           MandatoryInt64: "1000000000000000",
@@ -166,6 +171,7 @@ testCodec([
           OptionalInt64Copy: undefined,
           OptionalInt64Default: "-1",
           OptionalInt64Increment: "1",
+          OptionalInt64Delta: "-1",
         },
         {
           MandatoryInt64: "-9223372036854775807",
@@ -179,6 +185,7 @@ testCodec([
           OptionalInt64Copy: undefined,
           OptionalInt64Default: "9223372036854775806",
           OptionalInt64Increment: "-9223372036854775807",
+          OptionalInt64Delta: "0",
         },
         {
           MandatoryInt64: "9223372036854775807",
@@ -192,6 +199,7 @@ testCodec([
           OptionalInt64Copy: undefined,
           OptionalInt64Default: undefined,
           OptionalInt64Increment: "-9223372036854775806",
+          OptionalInt64Delta: "0",
         }
       ]
     }
