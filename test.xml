@@ -106,13 +106,9 @@
     </decimal>
 
     <decimal name="OptionalDecimal" id="81" presence="optional"/>
-
   </template>
 
-
-
-
-  <!--template id="4" name="SequenceMessage">
+  <template id="4" name="SequenceMessage">
     <sequence name="MandatorySequence">
       <length name="NoMandatorySequence"/>
       <uInt32 name="SeqMandatoryUInt32" id="311"/>
@@ -137,7 +133,7 @@
   </template>
 
 
-  <template id="5" name="GroupMessage">
+  <!--template id="5" name="GroupMessage">
 
     <group name="MandatoryGroup">
       <uInt32 name="GrpMandatoryUInt32" id="211"/>

@@ -22,6 +22,22 @@ function toHexString(byteArray) {
   return s;
 }
 
+function parseDecimal(str) {
+  if (!str) return undefined
+  // [1] SIGN
+  // [2] + [4] MANTISSA
+  // [6] EXPONENT
+  var matches = str.match(/^([+-])?(\d+)?(\.)?(\d*)?(e([+-]?\d+))?$/)
+
+  var sign = matches[1] != null ? matches[1] : '+'
+  var pre = matches[2] != null ? matches[2] : ''
+  var post = matches[4] != null ? matches[4].replace(/0*$/, '') : ''
+
+  var mantissa = Long.fromString(pre.concat(post)).multiply(sign == '-' ? Long.NEG_ONE : Long.ONE)
+  var exponent = matches[6] != null ? Number(matches[6]) - post.length : 0 - post.length
+  return {m: mantissa.toString(10), e: exponent}
+}
+
 var Operator = {
 	NONE: undefined,
 	CONSTANT: 1,
@@ -1050,7 +1066,7 @@ Encoder.prototype.encodeUInt32Value = function(ctx, field, value) {
 				break
 		}
 	}
-	if (logEncode) console.log('ENCODED:', toHexString(ctx.buffer.slice(pos)), '\n')
+	if (logEncode) console.log('ENCODED(U32):', toHexString(ctx.buffer.slice(pos)), '\n')
 }
 
 Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
@@ -1241,8 +1257,9 @@ Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
 	if (logEncode) console.log('ENCODED(U64):', toHexString(ctx.buffer.slice(pos)), '\n')
 }
 
-Encoder.prototype.encodeDecimalValue = function(ctx, field, value) {
-	if (logEncode) console.log('EncodeDecimalValue:', field.name, value, field.isOptional(), field.operator)
+Encoder.prototype.encodeDecimalValue = function(ctx, field, valueIn) {
+	if (logEncode) console.log('EncodeDecimalValue:', field.name, valueIn, field.isOptional(), field.operator)
+	var value = parseDecimal(valueIn)
 	var pos = ctx.buffer.length
 	var optional = field.isOptional()
 	if (!field.hasOperator()) {
@@ -1265,16 +1282,16 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, value) {
 					ctx.setBit(false)
 				} else {
 					ctx.setBit(true)
-					this.encodeI32(ctx, value.e, optional)
-					this.encodeI64(ctx, Long.fromValue(value.m), false)
+					this.encodeI32(ctx, value == null ? undefined : value.e, optional)
+					if (value != null) this.encodeI64(ctx, Long.fromValue(value.m), false)
 					entry.assign(value)
 				}
 				break
 			case 'default':
 				if (value != field.operator.value) {
 					ctx.setBit(true)
-					this.encodeI32(ctx, value.e, optional)
-					this.encodeI64(ctx, Long.fromValue(value.m), false)
+					this.encodeI32(ctx, value == null ? undefined : value.e, optional)
+					if (value != null) this.encodeI64(ctx, Long.fromValue(value.m), false)
 				} else {
 					ctx.setBit(false)
 				}

@@ -84,7 +84,6 @@ function testCodec(messages) {
 console.log('\n'.repeat(30))
 console.log('Start testing fast-protocol encode/decode')
 
-
 testCodec([
   {
     name: "Int32TestMessage",
@@ -684,20 +683,17 @@ testCodec([
   },
 ])
 
-// test DecimalMessage
-/*
+// test Decimal
 testCodec([
   {
     name: "DecimalMessage",
     msg: {
-      MandatoryDecimal: {m: "1", e: 0},
-      MandatoryDecimalCopy: {m: "3", e: -2},
-      OptionalDecimal: {m: "2", e: -1},
+      MandatoryDecimal: "100",
+      MandatoryDecimalCopy: "3e-2",
+      OptionalDecimal: "2e-1",
     }
   }
 ])
-*/
-
 
 // test SequenceMessage
 testCodec([
