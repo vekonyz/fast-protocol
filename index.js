@@ -283,15 +283,14 @@ function Decoder(fileName) {
 	var templates = getElementsByName(allTemplates.elements, 'template')
 
 	for (var i = 0; i < templates.length; ++i) {
-		//console.log('Add Template: ', templates[i].attributes.name, templates[i].attributes.id)
-
 		var tpl = new Element(templates[i].attributes.name, 'message', templates[i].attributes.id)
 		Element.parse(tpl, templates[i].elements)
 
 		this.templates[tpl.id] = tpl
-		//console.log('TEMPLATE', '\n', tpl)
-		//console.log(JSON.stringify(tpl, null, 2));
-		//this.templates[templates[i].attributes.id] = templates[i]
+	}
+	if (!this.templates[120]) {
+		// Add FAST Reset
+		this.templates[120] = new Element('FASTReset', 'message', 120)
 	}
 }
 
@@ -310,8 +309,6 @@ Decoder.prototype.decode = function(buffer, callbacks) {
 		// lookup template definition
 		var tpl = this.templates[this.TemplateID]
 		if (tpl) {
-			//console.log('\n', 'Template definition for', this.TemplateID, 'found:', tpl.name)
-
 			var msg = this.decodeGroup(ctx, tpl.elements)
 
 			// call handler if available
@@ -321,6 +318,11 @@ Decoder.prototype.decode = function(buffer, callbacks) {
 				callbacks[tpl.name](msg, tpl)
 			} else if (callbacks['default']){
 				callbacks['default'](msg, tpl.name, tpl)
+			}
+
+			if (tpl.id == 120) {
+				// FAST reset
+				this.Dictionary.reset()
 			}
 		}
 	}
@@ -906,6 +908,10 @@ function Encoder(fileName) {
 			this.templates[tpl.id] = tpl
 			this.templates[tpl.name] = tpl
 		}
+		if (!this.templates[120]) {
+			// Add FAST Reset
+			this.templates[120] = new Element('FASTReset', 'message', 120)
+		}
 }
 
 Encoder.prototype.encode = function(name, value) {
@@ -922,6 +928,11 @@ Encoder.prototype.encode = function(name, value) {
 
 	// encode message body
 	this.encodeGroup(ctx, tpl, value)
+
+	if (tpl.id == 120) {
+		// FAST Reset
+		this.Dictionary.reset()
+	}
 
 	// return the binary encoded message
 	return ctx.buffer
