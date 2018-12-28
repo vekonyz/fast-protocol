@@ -324,6 +324,10 @@ Decoder.prototype.decode = function(buffer, callbacks) {
 				// FAST reset
 				this.Dictionary.reset()
 			}
+		} else {
+			// template definition not found
+			console.log('Error: Template definition for template id =', this.TemplateID, 'not found!')
+			throw new Error('Error: Template definition for template id = ' + this.TemplateID + ' not found!')
 		}
 	}
 }
@@ -910,15 +914,20 @@ function Encoder(fileName) {
 		}
 		if (!this.templates[120]) {
 			// Add FAST Reset
-			this.templates[120] = new Element('FASTReset', 'message', 120)
+			var FASTReset = new Element('FASTReset', 'message', 120)
+			this.templates[120] = FASTReset
+			this.templates['FASTReset'] = FASTReset
 		}
 }
 
 Encoder.prototype.encode = function(name, value) {
+	if (logEncode) console.log('Encode message', name, 'value:', value)
 
 	// lookup template definition
 	var tpl = this.templates[name]
-	if (tpl == null) return undefined
+	if (tpl == null) {
+		throw new Error('Message tempate for ' + name + ' not found!')
+	}
 
 	// encode/reserve pmap bits
 	var ctx = new Context([])
@@ -931,6 +940,7 @@ Encoder.prototype.encode = function(name, value) {
 
 	if (tpl.id == 120) {
 		// FAST Reset
+		if (logEncode) console.log('Reset Dictionary')
 		this.Dictionary.reset()
 	}
 
@@ -940,56 +950,52 @@ Encoder.prototype.encode = function(name, value) {
 
 Encoder.prototype.encodeGroup = function(ctx, field, value, start) {
 	var elements = field.elements
-	//console.log('EncodeGroup:', field.name, 'PMAP_ELEMENTS:', field.pmapElements, elements.length)
-	if (!elements) return
+	if (elements) {
+		for (var i = start ? start : 0; i < elements.length; ++i) {
+			var element = elements[i]
+			var fieldName = element.name
+			var optional = element.isOptional()
+			var operator = element.operator
 
-	// LOG
-	//var begin = ctx.buffer.length
-
-	for (var i = start ? start : 0; i < elements.length; ++i) {
-		var element = elements[i]
-		var fieldName = element.name
-		var optional = element.isOptional()
-		var operator = element.operator
-
-		switch (element.type) {
-			case 'int32':
-				this.encodeInt32Value(ctx, element, value[fieldName])
-				break
-			case 'uInt32':
-				this.encodeUInt32Value(ctx, element, value[fieldName])
-				break
-			case 'int64':
-				this.encodeInt64Value(ctx, element, value[fieldName] != null ? Long.fromValue(value[fieldName]) : undefined)
-				break
-			case 'uInt64':
-				this.encodeUInt64Value(ctx, element, value[fieldName] != null ? Long.fromValue(value[fieldName], true) : undefined)
-				break
-			case 'decimal':
-				this.encodeDecimalValue(ctx, element, value[fieldName])
-				break
-			case 'string':
-				this.encodeStringValue(ctx, element, value[fieldName])
-				break
-			case 'byteVector':
-				this.encodeByteVectorValue(ctx, element, value[fieldName])
-				break
-			case 'group':
-				if (optional) {
-					ctx.setBit(value[fieldName] != null)
-				}
-				if (value[fieldName] != null) {
-					var groupCtx = new Context([])
-					this.encodeGroup(groupCtx, element, value[fieldName])
-					ctx.buffer.push.apply(ctx.buffer, groupCtx.buffer)
-				}
-				break
-			case 'sequence':
-				this.encodeSequence(ctx, element, value[fieldName])
-				break
-			default:
-				console.log('Not supported type', element.type, fieldName)
-				break
+			switch (element.type) {
+				case 'int32':
+					this.encodeInt32Value(ctx, element, value[fieldName])
+					break
+				case 'uInt32':
+					this.encodeUInt32Value(ctx, element, value[fieldName])
+					break
+				case 'int64':
+					this.encodeInt64Value(ctx, element, value[fieldName] != null ? Long.fromValue(value[fieldName]) : undefined)
+					break
+				case 'uInt64':
+					this.encodeUInt64Value(ctx, element, value[fieldName] != null ? Long.fromValue(value[fieldName], true) : undefined)
+					break
+				case 'decimal':
+					this.encodeDecimalValue(ctx, element, value[fieldName])
+					break
+				case 'string':
+					this.encodeStringValue(ctx, element, value[fieldName])
+					break
+				case 'byteVector':
+					this.encodeByteVectorValue(ctx, element, value[fieldName])
+					break
+				case 'group':
+					if (optional) {
+						ctx.setBit(value[fieldName] != null)
+					}
+					if (value[fieldName] != null) {
+						var groupCtx = new Context([])
+						this.encodeGroup(groupCtx, element, value[fieldName])
+						ctx.buffer.push.apply(ctx.buffer, groupCtx.buffer)
+					}
+					break
+				case 'sequence':
+					this.encodeSequence(ctx, element, value[fieldName])
+					break
+				default:
+					console.log('Error: Not supported type', element.type, fieldName)
+					break
+			}
 		}
 	}
 

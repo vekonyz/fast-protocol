@@ -14,9 +14,11 @@ function toHexString(byteArray) {
 
 function join(array) {
   var s = ''
-  array.forEach(function(token) {
-    s += (token === parseInt(token, 10)) ? '[' + token + ']' : (s.length ? '.' : '') + token
-  })
+  if (array) {
+    array.forEach(function(token) {
+      s += (token === parseInt(token, 10)) ? '[' + token + ']' : (s.length ? '.' : '') + token
+    })
+  }
   return s
 }
 
@@ -46,7 +48,7 @@ function testCodec(messages) {
   var i = 0
   decoder.decode(buffer, function(msg, name) {
 
-    if (logDebug) console.log('Output message:', msg)
+    if (logDebug) console.log('Output message(', name, '):\n', msg)
 
     var differences = diff(messages[i].msg, msg)
     if (differences != null) {
@@ -83,6 +85,30 @@ function testCodec(messages) {
 
 console.log('\n'.repeat(30))
 console.log('Start testing fast-protocol encode/decode')
+
+// test Decimal
+testCodec([
+  {
+    name: "DecimalMessage",
+    msg: {
+      MandatoryDecimal: "100",
+      MandatoryDecimalCopy: "3e-2",
+      OptionalDecimal: "2e-1",
+    }
+  },
+  {
+    name: "FASTReset",
+    msg: {}
+  },
+  {
+    name: "DecimalMessage",
+    msg: {
+      MandatoryDecimal: "99",
+      MandatoryDecimalCopy: "3e-2",
+      OptionalDecimal: "2e-1",
+    }
+  }
+])
 
 testCodec([
   {
@@ -689,6 +715,18 @@ testCodec([
     name: "DecimalMessage",
     msg: {
       MandatoryDecimal: "100",
+      MandatoryDecimalCopy: "3e-2",
+      OptionalDecimal: "2e-1",
+    }
+  },
+  {
+    name: "FASTReset",
+    msg: {}
+  },
+  {
+    name: "DecimalMessage",
+    msg: {
+      MandatoryDecimal: "99",
       MandatoryDecimalCopy: "3e-2",
       OptionalDecimal: "2e-1",
     }

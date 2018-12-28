@@ -133,24 +133,6 @@
   </template>
 
 
-  <!--template id="5" name="GroupMessage">
-
-    <group name="MandatoryGroup">
-      <uInt32 name="GrpMandatoryUInt32" id="211"/>
-    </group>
-
-    <group name="OptionalGroup" presence="optional">
-      <uInt32 name="GrpMandatoryUInt32" id="211"/>
-    </group>
-
-  </template>
-
-  <template id="4" name="DeltaStringOperatorMessage">
-    <string name="MandatoryStringDelta" id="1">
-	     <delta/>
-    </string>
-  </template>
-
   <template id="5" name="StringTestMessage">
     <sequence name="StringArray">
       <length name="NoStrings"/>
@@ -158,7 +140,7 @@
         <delta/>
       </string>
     </sequence>
-  </template-->
+  </template>
 
   <template id="6" name="Int32TestMessage">
     <sequence name="Int32Array">
@@ -230,6 +212,24 @@
       <uInt64 name="OptionalUInt64Incremental" presence="optional"><incremental/></uInt64>
       <uInt64 name="OptionalUInt64Delta" presence="optional"><delta/></uInt64>
     </sequence>
+  </template>
+
+  <template id="10" name="GroupMessage">
+
+    <group name="MandatoryGroup">
+      <uInt32 name="GrpMandatoryUInt32" id="211"/>
+    </group>
+
+    <group name="OptionalGroup" presence="optional">
+      <uInt32 name="GrpMandatoryUInt32" id="211"/>
+    </group>
+
+  </template>
+
+  <template id="11" name="DeltaStringOperatorMessage">
+    <string name="MandatoryStringDelta" id="1">
+	     <delta/>
+    </string>
   </template>
 
   <template id="100" name="UInt32EncodingTestMessage">
