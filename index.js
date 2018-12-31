@@ -1558,7 +1558,6 @@ Encoder.prototype.encodeU32 = function(ctx, valueIn, optional)
 
 Encoder.prototype.encodeU64 = function(ctx, valueIn, optional)
 {
-	//console.log('encodeU64:', value.toString(10))
 	if (optional && valueIn == null) {
 		this.encodeNull(ctx)
 	} else {
@@ -1622,8 +1621,6 @@ Encoder.prototype.encodeI64 = function(ctx, valueIn, optional)
 	var size = this.getSizeI64(value);
 	var sign = value.isNegative() ? 0x40 : 0
 
-	//console.log('encodeI64:', value.toString(10), 'SIZE:', size, 'HEX:', value.toString(16), 'SIGN:', sign)
-
 	for (var i = 0; i < size; ++i) {
 		var byte = (value.shiftRight(this.SHIFT[size - i]).getLowBits() & (i > 0 ? 0x7f : 0x3f)) | (i > 0 ? 0 : sign)
 		ctx.buffer.push(byte)
@@ -1662,24 +1659,19 @@ Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 	for (var i = value.length, j = dict.length; i > 0 && j > 0 && value.charCodeAt(i - 1) == dict.charCodeAt(j - 1); --i, --j) {}
 	var post = value.length - i
 
-	//console.log('COMPARE, PRE:', pre, 'POST:', post)
 	if ( pre > 0 || post > 0 )
 	{
 		if (pre == post && pre == value.length) {
-			//console.log('STRING EQUALS')
 			this.encodeI32(ctx, 0, optional)
 			this.encodeString(ctx, "", false)
 		} else if ( pre < post ) {
-			//console.log('POST', post - dict.length - 1, value.substring(0, value.length - post))
 			this.encodeI32(ctx, post - dict.length - 1, optional)
 			this.encodeString(ctx, value.substring(0, value.length - post), false)
 		} else {
-			//console.log('PRE', dict.length - pre , value.substring(pre))
 			this.encodeI32(ctx, dict.length - pre, optional)
 			this.encodeString(ctx, value.substring(pre), false)
 		}
 	} else {
-		//console.log('ENCODE DELTA ALL', value, dict.length)
 		this.encodeI32(ctx, dict.length, optional)
 		this.encodeString(ctx, value, false)
 	}
