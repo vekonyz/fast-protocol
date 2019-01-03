@@ -357,7 +357,7 @@ Decoder.prototype.decodeUInt32Value = function(ctx, field) {
 			if (ctx.isBitSet()) {
 				return this.decodeU32(optional)
 			} else {
-				return Number(field.operator.value)
+				return optional & field.operator.value == null ? undefined : Number(field.operator.value)
 			}
 			break
 		case 'increment':
@@ -408,7 +408,7 @@ Decoder.prototype.decodeInt32Value = function(ctx, field) {
 			if (ctx.isBitSet()) {
 				return this.decodeI32(optional)
 			} else {
-				return Number(field.operator.value)
+				return optional && field.operator.value == null ? undefined : Number(field.operator.value)
 			}
 			break
 		case 'increment':
