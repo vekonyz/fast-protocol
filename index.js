@@ -333,7 +333,7 @@ Decoder.prototype.decode = function(buffer, callbacks) {
 }
 
 Decoder.prototype.decodeUInt32Value = function(ctx, field) {
-	if (logDecode) console.log('DecodeUInt32Value', field.name, field.isOptional(), field.operator != null ? field.operator.name : '')
+	if (logDecode) console.log('DecodeUInt32Value', field.name, field.presence, field.operator != null ? field.operator.name : '')
 	var optional = field.isOptional()
 	if (!field.hasOperator()) return this.decodeU32(optional)
 
@@ -384,7 +384,7 @@ Decoder.prototype.decodeUInt32Value = function(ctx, field) {
 }
 
 Decoder.prototype.decodeInt32Value = function(ctx, field) {
-	if (logDecode) console.log('DecodeInt32Value', field.name, field.isOptional(), field.operator)
+	if (logDecode) console.log('DecodeInt32Value', field.name, field.presence, field.operator)
 	var optional = field.isOptional()
 	if (!field.hasOperator()) return this.decodeI32(optional)
 
@@ -434,7 +434,7 @@ Decoder.prototype.decodeInt32Value = function(ctx, field) {
 }
 
 Decoder.prototype.decodeUInt64Value = function(ctx, field) {
-	if (logDecode) console.log('DecodeUInt64Value', field.name, field.isOptional(), field.operator, this.pos)
+	if (logDecode) console.log('DecodeUInt64Value', field.name, field.presence, field.operator)
 	if (logDecode) console.log('DECODE(U64):', toHexString(this.buffer.slice(this.pos)), '\n')
 	//if (logDecode) console.log('DECODE:', toHexString(ctx.buffer.slice(this.pos, this.pos + 10)), '\n')
 	var optional = field.isOptional()
@@ -482,7 +482,7 @@ Decoder.prototype.decodeUInt64Value = function(ctx, field) {
 }
 
 Decoder.prototype.decodeInt64Value = function(ctx, field) {
-	if (logDecode) console.log('DecodeInt64Value', field.name, field.isOptional(), field.operator)
+	if (logDecode) console.log('DecodeInt64Value', field.name, field.presence, field.operator)
 	if (logDecode) console.log('DECODE(I64):', toHexString(this.buffer.slice(this.pos)), '\n')
 	var optional = field.isOptional()
 	if (!field.hasOperator()) return this.decodeI64(optional)
@@ -536,7 +536,7 @@ function decimalToString(value) {
 }
 
 Decoder.prototype.decodeDecimalValue = function(ctx, field) {
-	if (logDecode) console.log('DecodeDecimalValue', field.name, field.isOptional(), field)
+	if (logDecode) console.log('DecodeDecimalValue', field.name, field.presence, field)
 	var optional = field.isOptional()
 	if (!field.hasOperator()) return decimalToString(this.decodeDecimal(optional))
 
@@ -587,7 +587,7 @@ Decoder.prototype.decodeDecimalValue = function(ctx, field) {
 }
 
 Decoder.prototype.decodeStringValue = function(ctx, field) {
-	if (logDecode) console.log('DecodeStringValue', field.name, field.isOptional(), field.operator)
+	if (logDecode) console.log('DecodeStringValue', field.name, field.presence, field.operator)
 	var optional = field.isOptional()
 	if (!field.hasOperator()) return this.decodeString(optional)
 
@@ -820,31 +820,31 @@ Decoder.prototype.decodeGroup = function(ctx, elements, start) {
 		switch (element.type) {
 			case 'int32':
 				val[fieldName] = this.decodeInt32Value(ctx, element)
-				//console.log(fieldName, '=', val[fieldName])
+				if (logDecode) console.log(fieldName, '=', val[fieldName])
 				break
 			case 'uInt32':
 				val[fieldName] = this.decodeUInt32Value(ctx, element)
-				//console.log(fieldName, '=', val[fieldName])
+				if (logDecode) console.log(fieldName, '=', val[fieldName])
 				break
 			case 'int64':
 				val[fieldName] = this.decodeInt64Value(ctx, element)
-				//console.log(fieldName, '=', val[fieldName])
+				if (logDecode) console.log(fieldName, '=', val[fieldName])
 				break
 			case 'uInt64':
 				val[fieldName] = this.decodeUInt64Value(ctx, element)
-				//console.log(fieldName, '=', val[fieldName])
+				if (logDecode) console.log(fieldName, '=', val[fieldName])
 				break
 			case 'decimal':
 				val[fieldName] = this.decodeDecimalValue(ctx, element)
-				//console.log(fieldName, '=', val[fieldName])
+				if (logDecode) console.log(fieldName, '=', val[fieldName])
 				break
 			case 'string':
 				val[fieldName] = this.decodeStringValue(ctx, element)
-				//console.log(fieldName, '=', val[fieldName])
+				if (logDecode) console.log(fieldName, '=', val[fieldName])
 				break
 			case 'byteVector':
 				val[fieldName] = this.decodeByteVector()
-				//console.log(fieldName, '=', val[fieldName])
+				if (logDecode) console.log(fieldName, '=', val[fieldName])
 				break
 			case 'group':
 				var isBitSet = optional ? ctx.isBitSet() : false
@@ -868,7 +868,9 @@ Decoder.prototype.decodeGroup = function(ctx, elements, start) {
 }
 
 Decoder.prototype.decodeSequenceValue = function(ctx, sequence) {
+	if (logDecode) console.log('DecodeSequence', sequence.name, sequence.presence)
 	var length = this.decodeUInt32Value(ctx, sequence.lengthField)
+	if (logDecode) console.log(sequence.lengthField.name, '=', length)
 	if (!length) {
 		return undefined
 	}
