@@ -18,6 +18,10 @@ npm install fast-protocol
 * Load FAST xml template definition from file
 * Provide FAST message encoding and decoding
 
+## Known limitations
+* no 'streaming' support, only datagram or complete buffer can be encoded
+* no templateRef support
+
 ### Importing
 
 ```javascript
@@ -40,7 +44,7 @@ var encoder = new FastStream.Encoder('emdi-7.0.xml')
 var buffer = encoder.encode('RDPacketHeader', { SenderCompID: 1,
   PacketSeqNum: [ 0, 8, 58, 9 ],
   SendingTime: [ 21, 105, 89, 139, 55, 77, 80, 126 ] })
-  
+
 // process buffer
 ...
 ```
