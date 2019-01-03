@@ -536,7 +536,7 @@ function decimalToString(value) {
 }
 
 Decoder.prototype.decodeDecimalValue = function(ctx, field) {
-	if (logDecode) console.log('DecodeDecimalValue', field.name, field.presence, field)
+	if (logDecode) console.log('DecodeDecimalValue', field.name, field.presence, field.operator)
 	var optional = field.isOptional()
 	if (!field.hasOperator()) return decimalToString(this.decodeDecimal(optional))
 
