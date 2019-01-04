@@ -56,11 +56,6 @@ var Operator = {
 		delta: {name: 'delta', pmap: {mandatory: false, optional: false}}
 	},
 	occupyBit: function(operator, optional) {
-		/*
-		var ret = Operator.properties[operator].pmap[optional ? 'optional' : 'mandatory']
-		console.log('Occupy', Operator.properties[operator].pmap, optional, ret)
-		return ret
-		*/
 		return Operator.properties[operator].pmap[optional ? 'optional' : 'mandatory']
 	}
 }
@@ -213,7 +208,7 @@ function Context(pmap) {
 }
 
 Context.prototype.isBitSet = function() {
-	if (logInfo) console.log('PMAP[', this.idx, '] =', this.pmap[this.idx])
+	if (logDecode) console.log('PMAP[', this.idx, '] =', this.pmap[this.idx])
 	if (!this.pmap.length) {
 		console.log('PMAP overflow at', this.idx)
 		console.trace()
@@ -223,7 +218,7 @@ Context.prototype.isBitSet = function() {
 }
 
 Context.prototype.setBit = function(bit) {
-	if (logInfo) console.log('SET BIT', this.pmap.length, bit)
+	if (logEncode) console.log('SET PMAP[', this.pmap.length, '] =' bit)
 	this.pmap.push(bit)
 	if (logInfo) console.log('PMAP', this.pmap)
 }
@@ -266,11 +261,9 @@ function getOperator(elements) {
 
 
 function Decoder(fileName) {
-
 	// dictionary used for this decoder, will be filled during template load
 	this.Dictionary = new Dictionary()
 
-	//this.xml = xml
 	this.templateID = new Element('TemplateID', 'uInt32', 0, 'mandatory', {name: 'copy', key: 'templateID', value: undefined}, undefined)
 	this.TemplateID = 0
 	this.templates = []
@@ -303,7 +296,6 @@ Decoder.prototype.decode = function(buffer, callbacks) {
 	this.pos = 0
 	this.buffer = buffer
 	while (this.pos < this.buffer.length) {
-
 		// decode presence map
 		var ctx = new Context(this.decodePMAP())
 
@@ -441,7 +433,6 @@ Decoder.prototype.decodeInt32Value = function(ctx, field) {
 Decoder.prototype.decodeUInt64Value = function(ctx, field) {
 	if (logDecode) console.log('DecodeUInt64Value', field.name, field.presence, field.operator)
 	if (logDecode) console.log('DECODE(U64):', toHexString(this.buffer.slice(this.pos)), '\n')
-	//if (logDecode) console.log('DECODE:', toHexString(ctx.buffer.slice(this.pos, this.pos + 10)), '\n')
 	var optional = field.isOptional()
 	if (!field.hasOperator()) return this.decodeU64(optional)
 
@@ -547,7 +538,6 @@ Decoder.prototype.decodeDecimalValue = function(ctx, field) {
 	var optional = field.isOptional()
 	if (!field.hasOperator()) return decimalToString(this.decodeDecimal(optional))
 
-	//return man.concat('e', exp)
 	switch (field.operator.name) {
 		case 'constant':
 			if (optional) {
@@ -629,7 +619,7 @@ Decoder.prototype.decodeStringValue = function(ctx, field) {
 			var entry = this.Dictionary.getField(field.name)
 			var length = this.decodeI32(optional)
 			if (optional && length == null) {
-				entry.assign(undefined)
+				//entry.assign(undefined)
 				return undefined
 			} else {
 				var str = length == null ? '' : this.decodeString(false)
@@ -647,9 +637,7 @@ Decoder.prototype.decodeStringValue = function(ctx, field) {
 }
 
 Decoder.prototype.decodePMAP = function() {
-	//console.log('DECODE PMAP', this.buffer.length - this.pos)
-	//console.trace()
-	if (logInfo) console.log('DECODE PMAP', this.pos, this.buffer.length - this.pos)
+	if (logDecode) console.log('DECODE PMAP', this.pos, this.buffer.length - this.pos)
 	var pmap = []
 	while (this.pos < this.buffer.length) {
 		var byteVal = this.buffer[this.pos++]
@@ -670,7 +658,6 @@ Decoder.prototype.decodeI32 = function(optional) {
 		var byteVal = this.buffer[this.pos]
 		if (byteVal == 0x80)
 		{
-			//s.clear();
 			++this.pos;
 			return undefined;
 		}
@@ -683,7 +670,6 @@ Decoder.prototype.decodeI32 = function(optional) {
 		if (byteVal & 0x80) break
 	}
 
-	//console.log('DECODE I32:', (optional && val > 0) ? val - 1 : val, Number((optional && val > 0) ? val - 1 : val).toString(16))
 	return (optional && val > 0) ? val - 1 : val
 }
 
@@ -697,7 +683,6 @@ Decoder.prototype.decodeU32 = function(optional) {
 	}
 
 	var val = 0
-	//console.log('Decoding', this.buffer.length - this.pos, 'bytes')
 	for (; this.pos < this.buffer.length; ) {
 		var byteVal = this.buffer[this.pos++]
 
@@ -718,19 +703,11 @@ Decoder.prototype.decodeI64 = function(optional) {
 		}
 	}
 
-	//var val = (this.buffer[this.pos] & 0x40) > 0 ? -1 : 0
-	//var value = Long.fromInt((this.buffer[this.pos] & 0x40) > 0 ? -1 : 0)
 	var value = (this.buffer[this.pos] & 0x40) > 0 ? Long.NEG_ONE : Long.ZERO
-	//var value = Long.ZERO
-	//if ((this.buffer[this.pos] & 0x40) > 0) value = value.not()
 
-	//var value = Long.ZERO
-	//console.log('SIGNED VAL:', value.toString(16), value.toBytesBE())
 	for (var first = true; this.pos < this.buffer.length; first = false) {
 		var byte = this.buffer[this.pos++]
-		//val = (val << 7) + (byteVal & 0x7f)
 		value = value.shiftLeft(first ? 6 : 7).or(byte & (first ? 0x3f : 0x7f))
-		//console.log('SIGNED VAL:', value.toString(16), 'after', byte, value.toBytesBE())
 		if (byte & 0x80) break
 	}
 
@@ -751,14 +728,11 @@ Decoder.prototype.decodeU64 = function(optional) {
 	}
 
 	var value = Long.UZERO
-	//console.log('Decoding', this.buffer.length - this.pos, 'bytes')
 	for (; this.pos < this.buffer.length; ) {
 		var byteVal = this.buffer[this.pos++]
-		//console.log('DECODEU64 BYTE:', byteVal, value.toString(10), value.toString(16), value)
 		value = value.shiftLeft(7).or(byteVal & 0x7f)
 		if (byteVal & 0x80) break
 	}
-	//console.log('RESULT:', value.toString(10), value.toString(16), value)
 
 	if (optional) value = value.subtract(Long.UONE)
 
@@ -770,7 +744,6 @@ Decoder.prototype.decodeDecimal = function(optional) {
 		var byteVal = this.buffer[this.pos]
 		if (byteVal == 0x80)
 		{
-			//s.clear();
 			++this.pos;
 			return undefined;
 		}
@@ -782,13 +755,11 @@ Decoder.prototype.decodeDecimal = function(optional) {
 }
 
 Decoder.prototype.decodeString = function(optional) {
-	//console.log('DECODE_STRING', optional)
 	if (optional) {
 		var byteVal = this.buffer[this.pos]
 		if (byteVal == 0x80)
 		{
 			++this.pos;
-			//console.log('RETURN undefined for String')
 			return undefined;
 		}
 	}
@@ -822,7 +793,6 @@ Decoder.prototype.decodeGroup = function(ctx, elements, start) {
 		var fieldName = element.name
 		var optional = (element.presence == null) ? false : (element.presence == 'optional')
 		var operator = element.operator
-		//console.log('Decode', element.type, fieldName, optional, operator, element.pmap)
 
 		switch (element.type) {
 			case 'int32':
@@ -885,7 +855,6 @@ Decoder.prototype.decodeSequenceValue = function(ctx, sequence) {
 	var val = []
 	for (var i = 0; i < length; ++i) {
 		var groupCtx = new Context(sequence.pmapElements ? this.decodePMAP() : [])
-		//val.push(groupCtx)
 		val.push(this.decodeGroup(groupCtx, sequence.elements))
 	}
 	return val
@@ -922,7 +891,7 @@ function Encoder(fileName) {
 			this.templates[tpl.name] = tpl
 		}
 		if (!this.templates[120]) {
-			// Add FAST Reset
+			// Add FAST Reset if not present in the template definition
 			var FASTReset = new Element('FASTReset', 'message', 120)
 			this.templates[120] = FASTReset
 			this.templates['FASTReset'] = FASTReset
@@ -1179,7 +1148,6 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 				break
 			case 'copy':
 				var entry = this.Dictionary.getField(field.name)
-				//if (optional) console.log('ENCODE INT64:', value, entry)
 				if (entry.isAssigned() && value.equals(entry.Value)) {
 					ctx.setBit(false)
 				} else {
@@ -1527,15 +1495,12 @@ Encoder.prototype.getSizeI64 = function(value)
 }
 
 Encoder.prototype.encodePMAP = function(ctx) {
-	//console.log('ENCODE PMAP', ctx.pmap)
 	var byteVal = 0
 	var last = true
 	for (var i = ctx.pmap.length - 1; i >= 0; --i) {
-		//console.log('BIT', byteVal, i, ctx.pmap[i])
 		byteVal |= (ctx.pmap[i] ? 1 : 0) << (6 - (i % 7))
 
 		if (!((i) % 7)) {
-			//console.log('BYTE', byteVal, i)
 			ctx.buffer.unshift(last ? byteVal | 0x80 : byteVal)
 			byteVal = 0
 			last = false

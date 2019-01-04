@@ -21,6 +21,7 @@ npm install fast-protocol
 ## Known limitations
 * no 'streaming' support, only datagram or complete buffer can be encoded
 * no templateRef support
+* no individual operator support for decimal
 
 ### Importing
 
