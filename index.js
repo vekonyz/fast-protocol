@@ -381,7 +381,7 @@ Decoder.prototype.decodeUInt32Value = function(ctx, field) {
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
 			var streamValue = this.decodeI32(optional)
-			//console.log('STREAM_VALUE', streamValue)
+			if (optional && streamValue == null) return undefined
 			entry.assign((streamValue == null) ? undefined : ((entry.isAssigned() ? entry.Value : 0) + streamValue) >>> 0 )
 			return entry.Value
 	}
@@ -432,6 +432,7 @@ Decoder.prototype.decodeInt32Value = function(ctx, field) {
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
 			var streamValue = this.decodeI64(optional)
+			if (optional && streamValue == null) return undefined
 			entry.assign(streamValue == null ? undefined : entry.isAssigned() ? Long.fromValue(entry.Value).add(streamValue).toInt() : Long.fromValue(streamValue).toInt())
 			return entry.Value
 	}
@@ -480,6 +481,7 @@ Decoder.prototype.decodeUInt64Value = function(ctx, field) {
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
 			var streamValue = this.decodeI64(optional)
+			if (optional && streamValue == null) return undefined
 			entry.assign(streamValue == null ? undefined : entry.isAssigned() ? Long.fromValue(entry.Value, true).add(streamValue) : streamValue)
 			return entry.isAssigned() ? entry.Value.toString(10) : undefined
 	}
@@ -527,6 +529,7 @@ Decoder.prototype.decodeInt64Value = function(ctx, field) {
 		case 'delta':
 			var entry = this.Dictionary.getField(field.name)
 			var streamValue = this.decodeI64(optional)
+			if (optional && streamValue == null) return undefined
 			entry.assign(streamValue == null ? undefined : entry.isAssigned() ? Long.fromValue(entry.Value).add(streamValue) : streamValue)
 			return entry.isAssigned() ? entry.Value.toString(10) : undefined
 	}
