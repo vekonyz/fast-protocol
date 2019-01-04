@@ -213,8 +213,12 @@ function Context(pmap) {
 }
 
 Context.prototype.isBitSet = function() {
-	if (logInfo) console.log('IS_BIT_SET', this.pmap[this.idx], this.idx)
-	if (!this.pmap.length) console.trace()
+	if (logInfo) console.log('PMAP[', this.idx, '] =', this.pmap[this.idx])
+	if (!this.pmap.length) {
+		console.log('PMAP overflow at', this.idx)
+		console.trace()
+		throw new Error('PMAP overflow')
+	}
 	return this.pmap[this.idx++]
 }
 
@@ -576,7 +580,7 @@ Decoder.prototype.decodeDecimalValue = function(ctx, field) {
 			} else {
 				var streamManValue = this.decodeI64(false)
 
-				if (!entry.isAsigned()) {
+				if (!entry.isAssigned()) {
 					entry.assign({'m': "0", 'e': 0})
 				}
 
