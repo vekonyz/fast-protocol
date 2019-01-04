@@ -580,7 +580,7 @@ Decoder.prototype.decodeDecimalValue = function(ctx, field) {
 					entry.assign({'m': 0, 'e': 0})
 				}
 
-				entry.assign({'m': entry.Value.man + streamManValue, 'e': entry.Value.exp + streamExpValue})
+				entry.assign({'m': entry.Value.m + streamManValue, 'e': entry.Value.e + streamExpValue})
 			}
 			return decimalToString(entry.Value)
 	}
