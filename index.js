@@ -577,10 +577,10 @@ Decoder.prototype.decodeDecimalValue = function(ctx, field) {
 				var streamManValue = this.decodeI64(false)
 
 				if (!entry.isAsigned()) {
-					entry.assign({'m': 0, 'e': 0})
+					entry.assign({'m': "0", 'e': 0})
 				}
 
-				entry.assign({'m': entry.Value.m + streamManValue, 'e': entry.Value.e + streamExpValue})
+				entry.assign({'m': Long.fromString(entry.Value.m).add(streamManValue).toString(10), 'e': entry.Value.e + streamExpValue})
 			}
 			return decimalToString(entry.Value)
 	}
