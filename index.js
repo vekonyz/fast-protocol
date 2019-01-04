@@ -218,7 +218,7 @@ Context.prototype.isBitSet = function() {
 }
 
 Context.prototype.setBit = function(bit) {
-	if (logEncode) console.log('SET PMAP[', this.pmap.length, '] =' bit)
+	if (logEncode) console.log('SET PMAP[', this.pmap.length, '] =', bit)
 	this.pmap.push(bit)
 	if (logInfo) console.log('PMAP', this.pmap)
 }
