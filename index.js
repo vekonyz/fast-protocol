@@ -1026,9 +1026,13 @@ Encoder.prototype.encodeUInt32Value = function(ctx, field, value) {
 				if (entry.isAssigned() && value == entry.Value) {
 					ctx.setBit(false)
 				} else {
-					ctx.setBit(true)
-					this.encodeU32(ctx, value, optional)
-					entry.assign(value)
+					if (optional && value == null && !entry.isAssigned()) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeU32(ctx, value, optional)
+						entry.assign(value)
+					}
 				}
 				break
 			case 'default':
@@ -1098,9 +1102,13 @@ Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
 				if (entry.isAssigned() && value == entry.Value) {
 					ctx.setBit(false)
 				} else {
-					ctx.setBit(true)
-					this.encodeI32(ctx, value, optional)
-					entry.assign(value)
+					if (optional && value == null && !entry.isAssigned()) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeI32(ctx, value, optional)
+						entry.assign(value)
+					}
 				}
 				break
 			case 'default':
@@ -1170,9 +1178,13 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 				if (entry.isAssigned() && value.equals(entry.Value)) {
 					ctx.setBit(false)
 				} else {
-					ctx.setBit(true)
-					this.encodeI64(ctx, value, optional)
-					entry.assign(value)
+					if (optional && value == null && !entry.isAssigned()) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeI64(ctx, value, optional)
+						entry.assign(value)
+					}
 				}
 				break
 			case 'default':
@@ -1242,9 +1254,13 @@ Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
 				if (entry.isAssigned() && value == entry.Value) {
 					ctx.setBit(false)
 				} else {
-					ctx.setBit(true)
-					this.encodeU64(ctx, value, optional)
-					entry.assign(value)
+					if (optional && value == null && !entry.isAssigned()) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeU64(ctx, value, optional)
+						entry.assign(value)
+					}
 				}
 				break
 			case 'default':
