@@ -459,12 +459,7 @@ Decoder.prototype.decodeUInt64Value = function(ctx, field) {
 			}
 			return entry.Value
 		case 'default':
-			if (ctx.isBitSet()) {
-				return this.decodeU64(optional)
-			} else {
-				return field.operator.value
-			}
-			break
+			return ctx.isBitSet() ? this.decodeU64(optional) : field.operator.value
 		case 'increment':
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
@@ -507,12 +502,7 @@ Decoder.prototype.decodeInt64Value = function(ctx, field) {
 			}
 			return entry.Value
 		case 'default':
-			if (ctx.isBitSet()) {
-				return this.decodeI64(optional)
-			} else {
-				return field.operator.value
-			}
-			break
+			return ctx.isBitSet() ? this.decodeI64(optional) : field.operator.value
 		case 'increment':
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
@@ -1037,8 +1027,12 @@ Encoder.prototype.encodeUInt32Value = function(ctx, field, value) {
 				break
 			case 'default':
 				if (optional && value == null) {
-					ctx.setBit(true)
-					this.encodeNull(ctx)
+					if (field.operator.value == null) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeNull(ctx)
+					}
 				} else if (value != field.operator.value) {
 					ctx.setBit(true)
 					this.encodeU32(ctx, value, optional)
@@ -1113,8 +1107,12 @@ Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
 				break
 			case 'default':
 				if (optional && value == null) {
-					ctx.setBit(true)
-					this.encodeNull(ctx)
+					if (field.operator.value == null) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeNull(ctx)
+					}
 				} else if (value != field.operator.value) {
 					ctx.setBit(true)
 					this.encodeI32(ctx, value, optional)
@@ -1189,9 +1187,13 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 				break
 			case 'default':
 				if (optional && value == null) {
-					ctx.setBit(true)
-					this.encodeNull(ctx)
-				} else if (value.notEquals(field.operator.value)) {
+					if (field.operator.value == null) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeNull(ctx)
+					}
+				} else if (Long.fromValue(value).notEquals(field.operator.value)) {
 					ctx.setBit(true)
 					this.encodeI64(ctx, value, optional)
 				} else {
@@ -1264,11 +1266,18 @@ Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
 				}
 				break
 			case 'default':
-				if (value != field.operator.value) {
+				if (optional && value == null) {
+					if (field.operator.value == null) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeNull(ctx)
+					}
+				} else if (Long.fromValue(value, true).equals(Long.fromValue(field.operator.value, true))) {
+					ctx.setBit(false)
+				} else {
 					ctx.setBit(true)
 					this.encodeU64(ctx, value, optional)
-				} else {
-					ctx.setBit(false)
 				}
 				break
 			case 'increment':
