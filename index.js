@@ -1193,7 +1193,7 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 						ctx.setBit(true)
 						this.encodeNull(ctx)
 					}
-				} else if (Long.fromValue(value).notEquals(field.operator.value)) {
+				} else if (field.operator.value != null && Long.fromValue(value).notEquals(field.operator.value)) {
 					ctx.setBit(true)
 					this.encodeI64(ctx, value, optional)
 				} else {
@@ -1273,7 +1273,7 @@ Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
 						ctx.setBit(true)
 						this.encodeNull(ctx)
 					}
-				} else if (Long.fromValue(value, true).equals(Long.fromValue(field.operator.value, true))) {
+				} else if (field.operator.value != null && Long.fromValue(value, true).equals(Long.fromValue(field.operator.value, true))) {
 					ctx.setBit(false)
 				} else {
 					ctx.setBit(true)
