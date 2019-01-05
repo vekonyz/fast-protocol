@@ -22,6 +22,12 @@ function toHexString(byteArray) {
   return s;
 }
 
+function arrayFromBuffer(buffer) {
+	var ret = []
+	for (var i = 0; i < buffer.length; ++i) ret.push(buffer[i])
+	return ret
+}
+
 function parseDecimal(str) {
   if (!str) return undefined
   // [1] SIGN
@@ -776,7 +782,7 @@ Decoder.prototype.decodeString = function(optional) {
 
 Decoder.prototype.decodeByteVector = function() {
 	var len = this.decodeU32()
-	var val = this.buffer.slice(this.pos, this.pos + len)
+	var val = arrayFromBuffer(this.buffer.slice(this.pos, this.pos + len))
 	this.pos += len
 	return val
 }
