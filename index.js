@@ -469,10 +469,10 @@ Decoder.prototype.decodeUInt64Value = function(ctx, field) {
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
 				entry.assign(this.decodeU64(optional))
-			} else {
-				entry.assign(entry.Value + 1)
+			} else if (entry.isAssigned()) {
+				entry.assign(Long.fromValue(entry.Value).add(Long.UONE))
 			}
-			return entry.Value
+			return entry.isAssigned() ? entry.Value.toString(10) : undefined
 		case 'tail':
 			break
 		case 'delta':
@@ -517,7 +517,7 @@ Decoder.prototype.decodeInt64Value = function(ctx, field) {
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
 				entry.assign(this.decodeI64(optional))
-			} else {
+			} else if (entry.isAssigned()) {
 				entry.assign(Long.fromValue(entry.Value).add(Long.ONE))
 			}
 			return entry.isAssigned() ? entry.Value.toString(10) : undefined
