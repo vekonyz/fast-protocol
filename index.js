@@ -1045,8 +1045,12 @@ Encoder.prototype.encodeUInt32Value = function(ctx, field, value) {
 			case 'increment':
 				var entry = this.Dictionary.getField(field.name)
 				if (optional && value == null) {
-					ctx.setBit(true)
-					this.encodeNull(ctx)
+					if (entry.isAssigned()) {
+						ctx.setBit(true)
+						this.encodeNull(ctx)
+					} else {
+						ctx.setBit(false)
+					}
 				} else if (entry.isAssigned() && value == entry.Value + 1) {
 					ctx.setBit(false)
 				} else {
@@ -1113,8 +1117,12 @@ Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
 			case 'increment':
 				var entry = this.Dictionary.getField(field.name)
 				if (optional && value == null) {
-					ctx.setBit(true)
-					this.encodeNull(ctx)
+					if (entry.isAssigned()) {
+						ctx.setBit(true)
+						this.encodeNull(ctx)
+					} else {
+						ctx.setBit(false)
+					}
 				} else if (entry.isAssigned() && value == entry.Value + 1) {
 					ctx.setBit(false)
 				} else {
@@ -1181,8 +1189,12 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 			case 'increment':
 				var entry = this.Dictionary.getField(field.name)
 				if (optional && value == null) {
-					ctx.setBit(true)
-					this.encodeNull(ctx)
+					if (entry.isAssigned()) {
+						ctx.setBit(true)
+						this.encodeNull(ctx)
+					} else {
+						ctx.setBit(false)
+					}
 				} else if (entry.isAssigned() && value.equals(entry.Value.add(Long.ONE))) {
 					ctx.setBit(false)
 				} else {
@@ -1245,7 +1257,14 @@ Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
 				break
 			case 'increment':
 				var entry = this.Dictionary.getField(field.name)
-				if (entry.isAssigned() && value == entry.Value + 1) {
+				if (optional && value == null) {
+					if (entry.isAssigned()) {
+						ctx.setBit(true)
+						this.encodeNull(ctx)
+					} else {
+						ctx.setBit(false)
+					}
+				} else if (entry.isAssigned() && value == entry.Value + 1) {
 					ctx.setBit(false)
 				} else {
 					ctx.setBit(true)
