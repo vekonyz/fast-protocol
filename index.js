@@ -371,9 +371,9 @@ Decoder.prototype.decodeUInt32Value = function(ctx, field) {
 		case 'tail':
 			break
 		case 'delta':
-			var entry = this.Dictionary.getField(field.name)
 			var streamValue = this.decodeI32(optional)
 			if (optional && streamValue == null) return undefined
+			var entry = this.Dictionary.getField(field.name)
 			entry.assign((streamValue == null) ? undefined : ((entry.isAssigned() ? entry.Value : 0) + streamValue) >>> 0 )
 			return entry.Value
 	}
@@ -422,9 +422,9 @@ Decoder.prototype.decodeInt32Value = function(ctx, field) {
 		case 'tail':
 			break
 		case 'delta':
-			var entry = this.Dictionary.getField(field.name)
 			var streamValue = this.decodeI64(optional)
 			if (optional && streamValue == null) return undefined
+			var entry = this.Dictionary.getField(field.name)
 			entry.assign(streamValue == null ? undefined : entry.isAssigned() ? Long.fromValue(entry.Value).add(streamValue).toInt() : Long.fromValue(streamValue).toInt())
 			return entry.Value
 	}
@@ -470,9 +470,9 @@ Decoder.prototype.decodeUInt64Value = function(ctx, field) {
 		case 'tail':
 			break
 		case 'delta':
-			var entry = this.Dictionary.getField(field.name)
 			var streamValue = this.decodeI64(optional)
 			if (optional && streamValue == null) return undefined
+			var entry = this.Dictionary.getField(field.name)
 			entry.assign(streamValue == null ? undefined : entry.isAssigned() ? Long.fromValue(entry.Value, true).add(streamValue) : streamValue)
 			return entry.isAssigned() ? entry.Value.toString(10) : undefined
 	}
@@ -518,9 +518,9 @@ Decoder.prototype.decodeInt64Value = function(ctx, field) {
 		case 'tail':
 			break
 		case 'delta':
-			var entry = this.Dictionary.getField(field.name)
 			var streamValue = this.decodeI64(optional)
 			if (optional && streamValue == null) return undefined
+			var entry = this.Dictionary.getField(field.name)
 			entry.assign(streamValue == null ? undefined : entry.isAssigned() ? Long.fromValue(entry.Value).add(streamValue) : streamValue)
 			return entry.isAssigned() ? entry.Value.toString(10) : undefined
 	}
@@ -566,19 +566,16 @@ Decoder.prototype.decodeDecimalValue = function(ctx, field) {
 		case 'tail':
 			break
 		case 'delta':
-			var entry = this.Dictionary.getField(field.name)
 			var streamExpValue = this.decodeI32(optional)
 			if (streamExpValue == null) {
-				entry.assign(undefined)
-			} else {
-				var streamManValue = this.decodeI64(false)
-
-				if (!entry.isAssigned()) {
-					entry.assign({'m': "0", 'e': 0})
-				}
-
-				entry.assign({'m': Long.fromString(entry.Value.m).add(streamManValue).toString(10), 'e': entry.Value.e + streamExpValue})
+				return undefined
 			}
+			var entry = this.Dictionary.getField(field.name)
+			var streamManValue = this.decodeI64(false)
+			if (!entry.isAssigned()) {
+				entry.assign({m: "0", e: 0})
+			}
+			entry.assign({m: Long.fromString(entry.Value.m).add(streamManValue).toString(10), e: entry.Value.e + streamExpValue})
 			return decimalToString(entry.Value)
 	}
 }
@@ -981,6 +978,7 @@ Encoder.prototype.encodeGroup = function(ctx, field, value, start) {
 }
 
 Encoder.prototype.encodeSequence = function(ctx, field, value, start) {
+	if (logEncode) console.log('EncodeSequence:', field.name, value, 'OPT:', field.isOptional(), 'HAS_OP:', field.lengthField.hasOperator())
 	var begin = ctx.buffer.length
 
 	var optional = field.isOptional()
@@ -1054,8 +1052,12 @@ Encoder.prototype.encodeUInt32Value = function(ctx, field, value) {
 			case 'tail':
 				break
 			case 'delta':
+				if (optional && value == null) {
+					this.encodeNull(ctx)
+					break
+				}
 				var entry = this.Dictionary.getField(field.name)
-				var deltaValue = value != null ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
+				var deltaValue = value - (entry.isAssigned() ? entry.Value : 0)
 				this.encodeI32(ctx, deltaValue, optional)
 				entry.assign(value)
 				break
@@ -1118,10 +1120,13 @@ Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
 			case 'tail':
 				break
 			case 'delta':
+				if (optional && value == null) {
+					this.encodeNull(ctx)
+					break
+				}
 				var entry = this.Dictionary.getField(field.name)
-				var deltaValue = value != null ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
-				//console.log('ENCODE DELTA VALUE:', deltaValue)
-				this.encodeI64(ctx, deltaValue != null ? Long.fromNumber(deltaValue) : undefined, optional)
+				var deltaValue = value - (entry.isAssigned() ? entry.Value : 0)
+				this.encodeI64(ctx, Long.fromNumber(deltaValue), optional)
 				entry.assign(value)
 				break
 		}
@@ -1183,8 +1188,12 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 			case 'tail':
 				break
 			case 'delta':
+				if (optional && value == null) {
+					this.encodeNull(ctx)
+					break
+				}
 				var entry = this.Dictionary.getField(field.name)
-				var deltaValue = value != null ? value.subtract((entry.isAssigned() ? entry.Value : Long.ZERO)) : undefined
+				var deltaValue = value.subtract((entry.isAssigned() ? entry.Value : Long.ZERO))
 				this.encodeI64(ctx, deltaValue, optional)
 				entry.assign(value)
 				break
@@ -1241,9 +1250,13 @@ Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
 			case 'tail':
 				break
 			case 'delta':
+				if (optional && value == null) {
+					this.encodeNull(ctx)
+					break
+				}
 				var entry = this.Dictionary.getField(field.name)
-				var deltaValue = value != null ? value.subtract((entry.isAssigned() ? entry.Value : Long.UZERO)) : undefined
-				this.encodeI64(ctx, deltaValue == null ? undefined : deltaValue.toSigned(), optional)
+				var deltaValue = value.subtract((entry.isAssigned() ? entry.Value : Long.UZERO))
+				this.encodeI64(ctx, deltaValue.toSigned(), optional)
 				entry.assign(value)
 				break
 		}
@@ -1304,10 +1317,15 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, valueIn) {
 			case 'tail':
 				break
 			case 'delta':
+				if (optional && value == null) {
+					this.encodeNull(ctx)
+					break
+				}
 				var entry = this.Dictionary.getField(field.name)
-				var deltaValue = value ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
-				this.encodeI32(ctx, value.e, optional)
-				this.encodeI64(ctx, Long.fromValue(value.m), false)
+				var deltaExpValue = value.e - (entry.isAssigned() ? entry.Value.e : 0)
+				var deltaManValue = Long.fromValue(value.m).subtract(entry.isAssigned() ? Long.fromValue(entry.Value.m) : Long.ZERO)
+				this.encodeI32(ctx, deltaExpValue, optional)
+				this.encodeI64(ctx, deltaManValue, false)
 				entry.assign(value)
 				break
 		}

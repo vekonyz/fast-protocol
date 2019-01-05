@@ -99,13 +99,15 @@
   </template>
 
   <template id="3" name="DecimalMessage">
-    <decimal name="MandatoryDecimal" id="71"/>
+    <sequence name="DecimalArray">
+      <length name="NoDecimals"/>
 
-    <decimal name="MandatoryDecimalCopy" id="73">
-      <copy/>
-    </decimal>
+      <decimal name="MandatoryDecimal" id="71"/>
+      <decimal name="MandatoryDecimalCopy" id="73"><copy/></decimal>
+      <decimal name="MandatoryDecimalDelta" id="74"><delta/></decimal>
 
-    <decimal name="OptionalDecimal" id="81" presence="optional"/>
+      <decimal name="OptionalDecimal" id="81" presence="optional"/>
+    </sequence>
   </template>
 
   <template id="4" name="SequenceMessage">
