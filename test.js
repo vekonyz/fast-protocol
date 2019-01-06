@@ -93,7 +93,7 @@ testCodec([
     msg: {
       DecimalArray: [
         {
-          MandatoryDecimal: "100",
+          MandatoryDecimal: "100e0",
           MandatoryDecimalCopy: "3e-2",
           MandatoryDecimalDelta: "3e-2",
           OptionalDecimal: "2e-1",
@@ -106,7 +106,7 @@ testCodec([
     msg: {
       DecimalArray: [
         {
-          MandatoryDecimal: "100",
+          MandatoryDecimal: "100e0",
           MandatoryDecimalCopy: "3e-2",
           MandatoryDecimalDelta: "3e-2",
           OptionalDecimal: "2e-1",
@@ -723,7 +723,7 @@ testCodec([
     msg: {
       DecimalArray: [
         {
-          MandatoryDecimal: "100",
+          MandatoryDecimal: "1e2",
           MandatoryDecimalCopy: "3e-2",
           MandatoryDecimalDelta: "3e-2",
           OptionalDecimal: "2e-1",
@@ -736,7 +736,7 @@ testCodec([
     msg: {
       DecimalArray: [
         {
-          MandatoryDecimal: "100",
+          MandatoryDecimal: "1e2",
           MandatoryDecimalCopy: "3e-2",
           MandatoryDecimalDelta: "3e-2",
           OptionalDecimal: "2e-1",
