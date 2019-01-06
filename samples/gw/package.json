@@ -1,0 +1,16 @@
+{
+  "name": "gwlogreader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gwlogreaded.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "deep-diff": "^1.0.2",
+    "fast-protocol": "0.0.35"
+  }
+}
