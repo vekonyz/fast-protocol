@@ -524,9 +524,12 @@ Decoder.prototype.decodeInt64Value = function(ctx, field) {
 
 function decimalToString(value) {
 	if (value == null) return undefined
+	return value.m.concat('e', value.e)
+	/*
 	if (value.e == 0) return value.m
 	if (value.e > 0 && value.e < 10) return value.m.concat('0'.repeat(value.e))
 	return value.m.concat('e', value.e)
+	*/
 }
 
 Decoder.prototype.decodeDecimalValue = function(ctx, field) {
@@ -1563,6 +1566,11 @@ Encoder.prototype.getSizeI64 = function(value)
 }
 
 Encoder.prototype.encodePMAP = function(ctx) {
+	var pos = ctx.buffer.length
+
+	// reduce pmap bits
+	while (ctx.pmap.length > 7 && ctx.pmap[ctx.pmap.length - 1] == false) ctx.pmap.pop()
+
 	var byteVal = 0
 	var last = true
 	for (var i = ctx.pmap.length - 1; i >= 0; --i) {
@@ -1574,6 +1582,7 @@ Encoder.prototype.encodePMAP = function(ctx) {
 			last = false
 		}
 	}
+	if (logEncode) console.log('ENCODED(PMAP):', toHexString(ctx.buffer.slice(0, ctx.buffer.length - pos)), '\n')
 }
 
 Encoder.prototype.encodeNull = function(ctx) {
