@@ -1340,8 +1340,13 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, valueIn) {
 				break
 			case 'copy':
 				var entry = this.Dictionary.getField(field.name)
-				if (optional && value == null && !entry.isAssigned()) {
-					ctx.setBit(false)
+				if (optional && value == null) {
+					if (!entry.isAssigned()) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeNull(ctx)
+					}
 				} else if (entry.isAssigned() && value.m == entry.Value.m && value.e == entry.Value.e) {
 					ctx.setBit(false)
 				} else {
