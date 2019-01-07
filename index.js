@@ -83,6 +83,8 @@ function Element(name, type, id, presence, operator, elements) {
 	this.operator = operator
 	this.elements = undefined
 
+	if (this.type == 'decimal' && this.operator && this.operator.value) this.operator.decimalValue = parseDecimal(this.operator.value)
+
 	switch (type) {
 		case 'message':
 			this.pmapElements = 1
@@ -1341,19 +1343,23 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, valueIn) {
 				if (entry.isAssigned() && value.m == entry.Value.m && value.e == entry.Value.e) {
 					ctx.setBit(false)
 				} else {
-					ctx.setBit(true)
-					this.encodeI32(ctx, value == null ? undefined : value.e, optional)
-					if (value != null) this.encodeI64(ctx, Long.fromValue(value.m), false)
-					entry.assign(value)
+					if (optional && value == null && !entry.isAssigned()) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeI32(ctx, value == null ? undefined : value.e, optional)
+						if (value != null) this.encodeI64(ctx, Long.fromValue(value.m), false)
+						entry.assign(value)
+					}
 				}
 				break
 			case 'default':
-				if (value != field.operator.value) {
+				if (value.m == field.operator.decimalValue.m && value.e == field.operator.decimalValue.e) {
+					ctx.setBit(false)
+				} else {
 					ctx.setBit(true)
 					this.encodeI32(ctx, value == null ? undefined : value.e, optional)
 					if (value != null) this.encodeI64(ctx, Long.fromValue(value.m), false)
-				} else {
-					ctx.setBit(false)
 				}
 				break
 			case 'increment':
