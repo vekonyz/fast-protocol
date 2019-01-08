@@ -97,6 +97,8 @@ decoder.decode(buffer, {
 })
 ```
 
+## Test coverage
+Decode/Encode tests have been run using Xetra T7 EMDI market data of 03.01.2019; market data of the entide day have been decoded/encoded correctly - 100 % conformity achieved.
 
 ## API Documentation
 
