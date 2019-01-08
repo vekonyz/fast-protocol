@@ -1358,7 +1358,7 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, valueIn) {
 				}
 				break
 			case 'default':
-				if (value.m == field.operator.decimalValue.m && value.e == field.operator.decimalValue.e) {
+				if ( (value != null && value.m == field.operator.decimalValue.m && value.e == field.operator.decimalValue.e) || (optional && value == null && field.operator.value == null)) {
 					ctx.setBit(false)
 				} else {
 					ctx.setBit(true)
