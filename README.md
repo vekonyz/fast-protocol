@@ -19,9 +19,11 @@ npm install fast-protocol
 * Provide FAST message encoding and decoding
 
 ## Known limitations
-* no 'streaming' support, only datagram or complete buffer can be encoded
+* no 'streaming' support, only datagram or complete buffer can be encoded/decoded
 * no templateRef support
 * no individual operator support for decimal
+* only 'global' dictionary
+* limited error handling features implemented yet
 
 ### Importing
 
