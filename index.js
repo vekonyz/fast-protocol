@@ -1725,7 +1725,7 @@ Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 		if (pre == post && pre == value.length) {
 			this.encodeI32(ctx, 0, optional)
 			this.encodeString(ctx, "", false)
-		} else if ( pre < post ) {
+		} else if ( pre <= post ) {
 			this.encodeI32(ctx, post - dict.length - 1, optional)
 			this.encodeString(ctx, value.substring(0, value.length - post), false)
 		} else {
