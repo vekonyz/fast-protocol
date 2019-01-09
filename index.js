@@ -1439,10 +1439,6 @@ Encoder.prototype.encodeStringValue = function(ctx, field, value) {
 				var entry = this.Dictionary.getField(field.name)
 				var prevValue = entry.isAssigned() ? entry.Value : ""
 				this.encodeStringDelta(ctx, value, optional, prevValue)
-				/*
-				var deltaValue = value ? value - (entry.isAssigned() ? entry.Value : 0) : undefined
-				this.encodeI(ctx, deltaValue, optional)
-				*/
 				entry.assign(value)
 				break
 		}
