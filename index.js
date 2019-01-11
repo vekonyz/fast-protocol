@@ -846,7 +846,7 @@ Decoder.prototype.decodeSequenceValue = function(ctx, sequence) {
 	if (logDecode) console.log('DecodeSequence', sequence.name, sequence.presence)
 	var length = this.decodeUInt32Value(ctx, sequence.lengthField)
 	if (logDecode) console.log(sequence.lengthField.name, '=', length)
-	if (!length) {
+	if (length == null) {
 		return undefined
 	}
 
