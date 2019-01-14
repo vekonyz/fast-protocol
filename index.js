@@ -1178,7 +1178,7 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 				break
 			case 'copy':
 				var entry = this.Dictionary.getField(field.name)
-				if (entry.isAssigned() && value.equals(entry.Value)) {
+				if (entry.isAssigned() && value != null && value.equals(entry.Value)) {
 					ctx.setBit(false)
 				} else {
 					if (optional && value == null && !entry.isAssigned()) {
