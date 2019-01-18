@@ -1,4 +1,5 @@
-var FastStream = require('./index.js')
+const expect = require('chai').expect
+var FastStream = require('../index.js')
 //var assert = require('assert');
 var diff = require('deep-diff')
 
@@ -35,7 +36,7 @@ function testCodec(messages) {
   var buffer = []
 
   // encode messages ony by one
-  var encoder = new FastStream.Encoder('test.xml')
+  var encoder = new FastStream.Encoder(__dirname + '/test.xml')
   for (var i = 0; i < messages.length; ++i) {
     if (logDebug) console.log('Input message:', messages[i].msg)
     buffer = buffer.concat(encoder.encode(messages[i].name, messages[i].msg))
@@ -44,7 +45,7 @@ function testCodec(messages) {
   if (logDebug) console.log('\n', toHexString(buffer), '\n')
 
   // decode buffer
-  var decoder = new FastStream.Decoder('test.xml')
+  var decoder = new FastStream.Decoder(__dirname + '/test.xml')
   var i = 0
   decoder.decode(buffer, function(msg, name) {
 
@@ -68,6 +69,7 @@ function testCodec(messages) {
             break
         }
       }
+      expect(messages[i].msg).to.be.deep.equal(msg);
       throw new Error('Decoded message does not match expected message')
     }
     console.log('Info: ', messages[i].name, 'passed test')

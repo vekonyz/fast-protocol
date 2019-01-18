@@ -4,7 +4,7 @@
   "description": "FAST streaming protocol for Node.js (Encoder/Decoder for Javascript) (FAST protocol version 1.1)",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js",
+    "test": "nyc --reporter=text mocha",
     "prepublish": "npm test"
   },
   "repository": {
@@ -16,7 +16,10 @@
     "xml-js": "^1.6.8"
   },
   "devDependencies": {
-    "deep-diff": "^1.0.2"
+    "deep-diff": "^1.0.2",
+    "nyc": "*",
+    "chai": "*",
+    "mocha": "*"
   },
   "keywords": [
     "FIX",
