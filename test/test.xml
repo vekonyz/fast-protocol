@@ -106,11 +106,13 @@
       <decimal name="MandatoryDecimalConst" id="72"><constant value="1e0"/></decimal>
       <decimal name="MandatoryDecimalCopy" id="73"><copy/></decimal>
       <decimal name="MandatoryDecimalDelta" id="74"><delta/></decimal>
+      <decimal name="MandatoryDecimalDefault" id="75"><default value="1e0"/></decimal>
 
       <decimal name="OptionalDecimal" id="81" presence="optional"/>
       <decimal name="OptionalDecimalConst" id="82" presence="optional"><constant value="1e0"/></decimal>
       <decimal name="OptionalDecimalCopy" id="83" presence="optional"><copy/></decimal>
       <decimal name="OptionalDecimalDelta" id="84" presence="optional"><delta/></decimal>
+      <decimal name="OptionalDecimalDefault" id="85" presence="optional"><default value="1e0"/></decimal>
     </sequence>
   </template>
 
@@ -161,6 +163,7 @@
       <int32 name="OptionalInt32Const" presence="optional"><constant value="-2147483648"/></int32>
       <int32 name="OptionalInt32Copy" presence="optional"><copy/></int32>
       <int32 name="OptionalInt32Default" presence="optional"><default value="2147483647"/></int32>
+      <int32 name="OptionalInt32DefaultWithoutValue" presence="optional"><default/></int32>
       <int32 name="OptionalInt32Increment" presence="optional"><increment/></int32>
       <int32 name="OptionalInt32Delta" presence="optional"><delta/></int32>
     </sequence>
@@ -179,6 +182,7 @@
       <uInt32 name="OptionalUInt32Const" presence="optional"><constant value="4294967295"/></uInt32>
       <uInt32 name="OptionalUInt32Copy" presence="optional"><copy/></uInt32>
       <uInt32 name="OptionalUInt32Default" presence="optional"><default value="4294967295"/></uInt32>
+      <uInt32 name="OptionalUInt32DefaultWithoutValue" presence="optional"><default/></uInt32>
       <uInt32 name="OptionalUInt32Incremental" presence="optional"><incremental/></uInt32>
       <uInt32 name="OptionalUInt32Delta" presence="optional"><delta/></uInt32>
     </sequence>
@@ -197,6 +201,7 @@
       <int64 name="OptionalInt64Const" presence="optional"><constant value="-9223372036854775807"/></int64>
       <int64 name="OptionalInt64Copy" presence="optional"><copy/></int64>
       <int64 name="OptionalInt64Default" presence="optional"><default value="9223372036854775806"/></int64>
+      <int64 name="OptionalInt64DefaultWithoutValue" presence="optional"><default/></int64>
       <int64 name="OptionalInt64Increment" presence="optional"><increment/></int64>
       <int64 name="OptionalInt64Delta" presence="optional"><delta/></int64>
     </sequence>
@@ -215,6 +220,7 @@
       <uInt64 name="OptionalUInt64Const" presence="optional"><constant value="18446744073709551615"/></uInt64>
       <uInt64 name="OptionalUInt64Copy" presence="optional"><copy/></uInt64>
       <uInt64 name="OptionalUInt64Default" presence="optional"><default value="18446744073709551615"/></uInt64>
+      <uInt64 name="OptionalUInt64DefaultWithoutValue" presence="optional"><default/></uInt64>
       <uInt64 name="OptionalUInt64Incremental" presence="optional"><incremental/></uInt64>
       <uInt64 name="OptionalUInt64Delta" presence="optional"><delta/></uInt64>
     </sequence>

@@ -50,6 +50,10 @@ function parseDecimal(str) {
   return {m: mantissa.toString(10), e: exponent}
 }
 
+function equals(array1, array2) {
+	return array1.length === array2.length && array1.every(function(value, index) { return value === array2[index]})
+}
+
 var Operator = {
 	NONE: undefined,
 	CONSTANT: 1,
@@ -1157,7 +1161,7 @@ Encoder.prototype.encodeInt32Value = function(ctx, field, value) {
 }
 
 Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
-	if (logEncode) console.log('EncodeInt64Value:', field.name, value != null ? value.toString(10) : undefined, 'OPT:', field.isOptional(), 'HAS_OP:', field.hasOperator())
+	if (logEncode) console.log('EncodeInt64Value:', field.name, value != null ? value.toString(10) : undefined, 'OPT:', field.isOptional(), 'Operator:', field.operator)
 	var pos = ctx.buffer.length
 	var optional = field.isOptional()
 	if (!field.hasOperator()) {
@@ -1195,7 +1199,7 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 						ctx.setBit(true)
 						this.encodeNull(ctx)
 					}
-				} else if (field.operator.value != null && Long.fromValue(value).notEquals(field.operator.value)) {
+				} else if ( (field.operator.value == null) || (field.operator.value != null && Long.fromValue(value).notEquals(field.operator.value)) ) {
 					ctx.setBit(true)
 					this.encodeI64(ctx, value, optional)
 				} else {
@@ -1237,7 +1241,7 @@ Encoder.prototype.encodeInt64Value = function(ctx, field, value) {
 }
 
 Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
-	if (logEncode) console.log('EncodeUInt64Value:', field.name, value == null ? undefined : value.toString(10), 'OPT:', field.isOptional(), 'HAS_OP:', field.hasOperator())
+	if (logEncode) console.log('EncodeUInt64Value:', field.name, value == null ? undefined : value.toString(10), 'OPT:', field.isOptional(), 'Operator:', field.operator)
 	var pos = ctx.buffer.length
 	var optional = field.isOptional()
 	if (!field.hasOperator()) {
@@ -1275,11 +1279,11 @@ Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
 						ctx.setBit(true)
 						this.encodeNull(ctx)
 					}
-				} else if (field.operator.value != null && Long.fromValue(value, true).equals(Long.fromValue(field.operator.value, true))) {
-					ctx.setBit(false)
-				} else {
+				} else if ( (field.operator.value == null) || (field.operator.value != null && Long.fromValue(value, true).notEquals(Long.fromValue(field.operator.value, true))) ) {
 					ctx.setBit(true)
 					this.encodeU64(ctx, value, optional)
+				} else {
+					ctx.setBit(false)
 				}
 				break
 			case 'increment':
@@ -1355,7 +1359,14 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, valueIn) {
 				}
 				break
 			case 'default':
-				if ( (value != null && value.m == field.operator.decimalValue.m && value.e == field.operator.decimalValue.e) || (optional && value == null && field.operator.value == null)) {
+				if (optional && value == null) {
+					if (field.operator.value == null) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeNull(ctx)
+					}
+				} else if ( (value != null && value.m == field.operator.decimalValue.m && value.e == field.operator.decimalValue.e) || (optional && value == null && field.operator.value == null)) {
 					ctx.setBit(false)
 				} else {
 					ctx.setBit(true)
@@ -1462,7 +1473,7 @@ Encoder.prototype.encodeByteVectorValue = function(ctx, field, value) {
 				break
 			case 'copy':
 				var entry = this.Dictionary.getField(field.name)
-				if (entry.isAssigned() && value != null && value == entry.Value) {
+				if (entry.isAssigned() && value != null && equals(value, entry.Value)) {
 					ctx.setBit(false)
 				} else {
 					if (optional && value == null && !entry.isAssigned()) {
@@ -1475,11 +1486,11 @@ Encoder.prototype.encodeByteVectorValue = function(ctx, field, value) {
 				}
 				break
 			case 'default':
-				if (value != field.operator.value) {
+				if (value != null && equals(value, field.operator.arrayValue)) {
+					ctx.setBit(false)
+				} else {
 					ctx.setBit(true)
 					this.encodeByteVector(ctx, value, optional)
-				} else {
-					ctx.setBit(false)
 				}
 				break
 			case 'increment':
