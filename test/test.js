@@ -88,36 +88,6 @@ function testCodec(messages) {
 
 console.log('Start testing fast-protocol encode/decode')
 
-// test Decimal
-testCodec([
-  {
-    name: "DecimalMessage",
-    msg: {
-      DecimalArray: [
-        {
-          MandatoryDecimal: "100e0",
-          MandatoryDecimalCopy: "3e-2",
-          MandatoryDecimalDelta: "3e-2",
-          OptionalDecimal: "2e-1",
-        }
-      ]
-    }
-  },
-  {
-    name: "DecimalMessage",
-    msg: {
-      DecimalArray: [
-        {
-          MandatoryDecimal: "100e0",
-          MandatoryDecimalCopy: "3e-2",
-          MandatoryDecimalDelta: "3e-2",
-          OptionalDecimal: "2e-1",
-        }
-      ]
-    }
-  }
-])
-
 
 testCodec([
   {
@@ -613,6 +583,31 @@ testCodec([
     name: "StringTestMessage",
     msg: {
       StringArray: [
+        {
+          MandatoryString: "",
+          MandatoryStringConst: "Hello World",
+          MandatoryStringCopy: "",
+          MandatoryStringDefault: "",
+          //MandatoryStringTail: "",
+          MandatoryStringDelta: "",
+          OptionalString: undefined,
+          OptionalStringConst: undefined,
+          OptionalStringCopy: undefined,
+          OptionalStringDefault: undefined,
+          OptionalStringIncremental: undefined,
+          OptionalStringDelta: undefined
+        }
+      ]
+    }
+  }
+])
+
+
+testCodec([
+  {
+    name: "StringTestMessageDelta",
+    msg: {
+      StringArray: [
         {MandatoryStringDelta: "Hello"},
         {MandatoryStringDelta: "Hello World"},
         {MandatoryStringDelta: "Hello World"},
@@ -721,27 +716,52 @@ testCodec([
 // test Decimal
 testCodec([
   {
-    name: "DecimalMessage",
+    name: "DecimalTestMessage",
     msg: {
       DecimalArray: [
         {
           MandatoryDecimal: "1e2",
+          MandatoryDecimalConst: "1e0",
           MandatoryDecimalCopy: "3e-2",
           MandatoryDecimalDelta: "3e-2",
-          OptionalDecimal: "2e-1",
+          OptionalDecimal: undefined,
+          OptionalDecimalConst: undefined,
+          OptionalDecimalCopy: undefined,
+          OptionalDecimalDelta: undefined,
         }
       ]
     }
   },
   {
-    name: "DecimalMessage",
+    name: "DecimalTestMessage",
     msg: {
       DecimalArray: [
         {
           MandatoryDecimal: "1e2",
+          MandatoryDecimalConst: "1e0",
           MandatoryDecimalCopy: "3e-2",
           MandatoryDecimalDelta: "3e-2",
           OptionalDecimal: "2e-1",
+          OptionalDecimalConst: "1e0",
+          OptionalDecimalCopy: "2e-1",
+          OptionalDecimalDelta: "2e-1",
+        }
+      ]
+    }
+  },
+  {
+    name: "DecimalTestMessage",
+    msg: {
+      DecimalArray: [
+        {
+          MandatoryDecimal: "1e2",
+          MandatoryDecimalConst: "1e0",
+          MandatoryDecimalCopy: "3e-2",
+          MandatoryDecimalDelta: "3e-2",
+          OptionalDecimal: undefined,
+          OptionalDecimalConst: undefined,
+          OptionalDecimalCopy: undefined,
+          OptionalDecimalDelta: undefined,
         }
       ]
     }
@@ -772,5 +792,25 @@ testCodec([
     }
   }
 ])
+
+// test ByteVectorTestMessage
+testCodec([
+  {
+    name: "ByteVectorTestMessage",
+    msg: {
+      ByteVectorArray: [
+        {
+          MandatoryByteVector: [23, 24, 25],
+          MandatoryByteVectorConst: [0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef],
+          MandatoryByteVectorCopy: [21, 22, 23],
+          OptionalByteVector: undefined,
+          OptionalByteVectorConst: undefined,
+          OptionalByteVectorCopy: undefined
+        }
+      ]
+    }
+  }
+])
+
 
 console.log('Test done.')

@@ -98,15 +98,19 @@
     </uInt32>
   </template>
 
-  <template id="3" name="DecimalMessage">
+  <template id="3" name="DecimalTestMessage">
     <sequence name="DecimalArray">
       <length name="NoDecimals"/>
 
       <decimal name="MandatoryDecimal" id="71"/>
+      <decimal name="MandatoryDecimalConst" id="72"><constant value="1e0"/></decimal>
       <decimal name="MandatoryDecimalCopy" id="73"><copy/></decimal>
       <decimal name="MandatoryDecimalDelta" id="74"><delta/></decimal>
 
       <decimal name="OptionalDecimal" id="81" presence="optional"/>
+      <decimal name="OptionalDecimalConst" id="82" presence="optional"><constant value="1e0"/></decimal>
+      <decimal name="OptionalDecimalCopy" id="83" presence="optional"><copy/></decimal>
+      <decimal name="OptionalDecimalDelta" id="84" presence="optional"><delta/></decimal>
     </sequence>
   </template>
 
@@ -135,7 +139,7 @@
   </template>
 
 
-  <template id="5" name="StringTestMessage">
+  <template id="5" name="StringTestMessageDelta">
     <sequence name="StringArray">
       <length name="NoStrings"/>
       <string name="MandatoryStringDelta" id="1">
@@ -216,7 +220,25 @@
     </sequence>
   </template>
 
-  <template id="10" name="GroupMessage">
+  <template id="10" name="StringTestMessage">
+    <sequence name="StringArray">
+      <length name="NoOfStrings"/>
+      <string name="MandatoryString"></string>
+      <string name="MandatoryStringConst"><constant value="Hello World"/></string>
+      <string name="MandatoryStringCopy"><copy/></string>
+      <string name="MandatoryStringDefault"><default value="Foo"/></string>
+      <!--string name="MandatoryStringTail"><tail/></string-->
+      <string name="MandatoryStringDelta"><delta/></string>
+      <string name="OptionalString" presence="optional"></string>
+      <string name="OptionalStringConst" presence="optional"><constant value="Mini mee"/></string>
+      <string name="OptionalStringCopy" presence="optional"><copy/></string>
+      <string name="OptionalStringDefault" presence="optional"><default value="tic-tac"/></string>
+      <string name="OptionalStringIncremental" presence="optional"><incremental/></string>
+      <string name="OptionalStringDelta" presence="optional"><delta/></string>
+    </sequence>
+  </template>
+
+  <template id="11" name="GroupMessage">
 
     <group name="MandatoryGroup">
       <uInt32 name="GrpMandatoryUInt32" id="211"/>
@@ -228,10 +250,22 @@
 
   </template>
 
-  <template id="11" name="DeltaStringOperatorMessage">
+  <template id="12" name="DeltaStringOperatorMessage">
     <string name="MandatoryStringDelta" id="1">
 	     <delta/>
     </string>
+  </template>
+
+  <template id="13" name="ByteVectorTestMessage">
+    <sequence name="ByteVectorArray">
+      <length name="NoOfByteVector"/>
+      <byteVector name="MandatoryByteVector"></byteVector>
+      <byteVector name="MandatoryByteVectorConst"><constant value="1234567890abcdef"/></byteVector>
+      <byteVector name="MandatoryByteVectorCopy"><copy/></byteVector>
+      <byteVector name="OptionalByteVector" presence="optional"></byteVector>
+      <byteVector name="OptionalByteVectorConst" presence="optional"><constant value="1234567890abcdef"/></byteVector>
+      <byteVector name="OptionalByteVectorCopy" presence="optional"><copy/></byteVector>
+    </sequence>
   </template>
 
   <template id="100" name="UInt32EncodingTestMessage">

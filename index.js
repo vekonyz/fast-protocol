@@ -28,6 +28,12 @@ function arrayFromBuffer(buffer) {
 	return ret
 }
 
+function parseByteVector(str) {
+	for (var bytes = [], c = 0; c < str.length; c += 2)
+	bytes.push(parseInt(str.substr(c, 2), 16));
+	return bytes;
+}
+
 function parseDecimal(str) {
   if (!str) return undefined
   // [1] SIGN
@@ -84,6 +90,7 @@ function Element(name, type, id, presence, operator, elements) {
 	this.elements = undefined
 
 	if (this.type == 'decimal' && this.operator && this.operator.value) this.operator.decimalValue = parseDecimal(this.operator.value)
+	if (this.type == 'byteVector' && this.operator && this.operator.value) this.operator.arrayValue = parseByteVector(this.operator.value)
 
 	switch (type) {
 		case 'message':
@@ -108,9 +115,10 @@ Element.prototype.addElement = function(element) {
 	this.elements.push(element)
 }
 
+/*
 Element.prototype.isMessage = function()  {
 	return this.type == 'message'
-}
+}*/
 
 Element.prototype.isOptional = function()  {
 	return this.presence == null ? false : this.presence == 'optional'
@@ -343,14 +351,9 @@ Decoder.prototype.decodeUInt32Value = function(ctx, field) {
 
 	switch (field.operator.name) {
 		case 'constant':
-			if (optional) {
-				// OPTIONAL
-				return ctx.isBitSet() ? Number(field.operator.value) : undefined
-			} else {
-				// MANDATORY
-				return Number(field.operator.value)
-			}
-			break
+			if (optional) return ctx.isBitSet() ? Number(field.operator.value) : undefined
+			// ELSE
+			return Number(field.operator.value)
 		case 'copy':
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
@@ -358,12 +361,9 @@ Decoder.prototype.decodeUInt32Value = function(ctx, field) {
 			}
 			return entry.Value
 		case 'default':
-			if (ctx.isBitSet()) {
-				return this.decodeU32(optional)
-			} else {
-				return optional & field.operator.value == null ? undefined : Number(field.operator.value)
-			}
-			break
+			if (ctx.isBitSet()) return this.decodeU32(optional)
+			// ELSE
+			return optional & field.operator.value == null ? undefined : Number(field.operator.value)
 		case 'increment':
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
@@ -376,8 +376,6 @@ Decoder.prototype.decodeUInt32Value = function(ctx, field) {
 				}
 			}
 			return entry.Value
-		case 'tail':
-			break
 		case 'delta':
 			var streamValue = this.decodeI32(optional)
 			if (optional && streamValue == null) return undefined
@@ -394,14 +392,9 @@ Decoder.prototype.decodeInt32Value = function(ctx, field) {
 
 	switch (field.operator.name) {
 		case 'constant':
-			if (optional) {
-				// OPTIONAL
-				return ctx.isBitSet() ? Number(field.operator.value) : undefined
-			} else {
-				// MANDATORY
-				return Number(field.operator.value)
-			}
-			break
+			if (optional) return ctx.isBitSet() ? Number(field.operator.value) : undefined
+			// ELSE
+			return Number(field.operator.value)
 		case 'copy':
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
@@ -409,12 +402,9 @@ Decoder.prototype.decodeInt32Value = function(ctx, field) {
 			}
 			return entry.Value
 		case 'default':
-			if (ctx.isBitSet()) {
-				return this.decodeI32(optional)
-			} else {
-				return optional && field.operator.value == null ? undefined : Number(field.operator.value)
-			}
-			break
+			if (ctx.isBitSet()) return this.decodeI32(optional)
+			// ELSE
+			return optional && field.operator.value == null ? undefined : Number(field.operator.value)
 		case 'increment':
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
@@ -427,8 +417,6 @@ Decoder.prototype.decodeInt32Value = function(ctx, field) {
 				}
 			}
 			return entry.Value
-		case 'tail':
-			break
 		case 'delta':
 			var streamValue = this.decodeI64(optional)
 			if (optional && streamValue == null) return undefined
@@ -446,14 +434,9 @@ Decoder.prototype.decodeUInt64Value = function(ctx, field) {
 
 	switch (field.operator.name) {
 		case 'constant':
-			if (optional) {
-				// OPTIONAL
-				return ctx.isBitSet() ? field.operator.value : undefined
-			} else {
-				// MANDATORY
-				return field.operator.value
-			}
-			break
+			if (optional) return ctx.isBitSet() ? field.operator.value : undefined
+			// ELSE
+			return field.operator.value
 		case 'copy':
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
@@ -470,8 +453,6 @@ Decoder.prototype.decodeUInt64Value = function(ctx, field) {
 				entry.assign(Long.fromValue(entry.Value).add(Long.UONE))
 			}
 			return entry.isAssigned() ? entry.Value.toString(10) : undefined
-		case 'tail':
-			break
 		case 'delta':
 			var streamValue = this.decodeI64(optional)
 			if (optional && streamValue == null) return undefined
@@ -489,14 +470,9 @@ Decoder.prototype.decodeInt64Value = function(ctx, field) {
 
 	switch (field.operator.name) {
 		case 'constant':
-			if (optional) {
-				// OPTIONAL
-				return ctx.isBitSet() ? field.operator.value : undefined
-			} else {
-				// MANDATORY
-				return field.operator.value
-			}
-			break
+			if (optional) return ctx.isBitSet() ? field.operator.value : undefined
+			// ELSE
+			return field.operator.value
 		case 'copy':
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
@@ -513,8 +489,6 @@ Decoder.prototype.decodeInt64Value = function(ctx, field) {
 				entry.assign(Long.fromValue(entry.Value).add(Long.ONE))
 			}
 			return entry.isAssigned() ? entry.Value.toString(10) : undefined
-		case 'tail':
-			break
 		case 'delta':
 			var streamValue = this.decodeI64(optional)
 			if (optional && streamValue == null) return undefined
@@ -541,14 +515,9 @@ Decoder.prototype.decodeDecimalValue = function(ctx, field) {
 
 	switch (field.operator.name) {
 		case 'constant':
-			if (optional) {
-				// OPTIONAL
-				return ctx.isBitSet() ? field.operator.value : undefined
-			} else {
-				// MANDATORY
-				return field.operator.value
-			}
-			break
+			if (optional) return ctx.isBitSet() ? field.operator.value : undefined
+			// ELSE
+			return field.operator.value
 		case 'copy':
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
@@ -561,10 +530,6 @@ Decoder.prototype.decodeDecimalValue = function(ctx, field) {
 			} else {
 				return field.operator.value
 			}
-			break
-		case 'increment':
-			break
-		case 'tail':
 			break
 		case 'delta':
 			var streamExpValue = this.decodeI32(optional)
@@ -588,14 +553,9 @@ Decoder.prototype.decodeStringValue = function(ctx, field) {
 
 	switch (field.operator.name) {
 		case 'constant':
-			if (optional) {
-				// OPTIONAL
-				return ctx.isBitSet() ? field.operator.value : undefined
-			} else {
-				// MANDATORY
-				return field.operator.value
-			}
-			break
+			if (optional) return ctx.isBitSet() ? field.operator.value : undefined
+			// ELSE
+			return field.operator.value
 		case 'copy':
 			var entry = this.Dictionary.getField(field.name)
 			if (ctx.isBitSet()) {
@@ -603,14 +563,7 @@ Decoder.prototype.decodeStringValue = function(ctx, field) {
 			}
 			return entry.Value
 		case 'default':
-			if (ctx.isBitSet()) {
-				return this.decodeString(optional)
-			} else {
-				return field.operator.value
-			}
-			break
-		case 'increment':
-			break
+			return ctx.isBitSet() ? this.decodeString(optional) : field.operator.value
 		case 'tail':
 			break
 		case 'delta':
@@ -621,6 +574,47 @@ Decoder.prototype.decodeStringValue = function(ctx, field) {
 				return undefined
 			} else {
 				var str = length == null ? '' : this.decodeString(false)
+				if (length < 0) {
+					entry.assign(str + entry.Value.substring((length + 1) * -1))
+				} else if (length > 0) {
+					entry.assign(entry.Value.substring(0, entry.Value.length - length) + str)
+				} else { // length == 0
+					entry.assign(entry.isAssigned() ? entry.Value + str : str)
+				}
+			}
+
+			return entry.Value
+	}
+}
+
+Decoder.prototype.decodeByteVectorValue = function(ctx, field) {
+	if (logDecode) console.log('DecodeByteVectorValue', field.name, field.presence, field.operator)
+	var optional = field.isOptional()
+	if (!field.hasOperator()) return this.decodeByteVector(optional)
+
+	switch (field.operator.name) {
+		case 'constant':
+			if (optional) return ctx.isBitSet() ? field.operator.arrayValue : undefined
+			// ELSE
+			return field.operator.arrayValue
+		case 'copy':
+			var entry = this.Dictionary.getField(field.name)
+			if (ctx.isBitSet()) {
+				entry.assign(this.decodeByteVector(optional))
+			}
+			return entry.Value
+		case 'default':
+			return ctx.isBitSet() ? this.decodeByteVector(optional) : field.operator.value
+		case 'tail':
+			break
+		case 'delta':
+			var entry = this.Dictionary.getField(field.name)
+			var length = this.decodeI32(optional)
+			if (optional && length == null) {
+				//entry.assign(undefined)
+				return undefined
+			} else {
+				var str = length == null ? '' : this.decodeByteVector(false)
 				if (length < 0) {
 					entry.assign(str + entry.Value.substring((length + 1) * -1))
 				} else if (length > 0) {
@@ -775,11 +769,14 @@ Decoder.prototype.decodeString = function(optional) {
 	return val
 }
 
-Decoder.prototype.decodeByteVector = function() {
-	var len = this.decodeU32()
-	var val = arrayFromBuffer(this.buffer.slice(this.pos, this.pos + len))
-	this.pos += len
-	return val
+Decoder.prototype.decodeByteVector = function(optional) {
+	var len = this.decodeU32(optional)
+	if (len != null) {
+		var val = arrayFromBuffer(this.buffer.slice(this.pos, this.pos + len))
+		this.pos += len
+		return val
+	}
+	return undefined
 }
 
 Decoder.prototype.decodeGroup = function(ctx, elements, start) {
@@ -818,7 +815,7 @@ Decoder.prototype.decodeGroup = function(ctx, elements, start) {
 				if (logDecode) console.log(fieldName, '=', val[fieldName])
 				break
 			case 'byteVector':
-				val[fieldName] = this.decodeByteVector()
+				val[fieldName] = this.decodeByteVectorValue(ctx, element)
 				if (logDecode) console.log(fieldName, '=', val[fieldName])
 				break
 			case 'group':
@@ -1258,7 +1255,7 @@ Encoder.prototype.encodeUInt64Value = function(ctx, field, value) {
 				break
 			case 'copy':
 				var entry = this.Dictionary.getField(field.name)
-				if (entry.isAssigned() && value == entry.Value) {
+				if (entry.isAssigned() && value != null && value.equals(entry.Value)) {
 					ctx.setBit(false)
 				} else {
 					if (optional && value == null && !entry.isAssigned()) {
@@ -1465,12 +1462,16 @@ Encoder.prototype.encodeByteVectorValue = function(ctx, field, value) {
 				break
 			case 'copy':
 				var entry = this.Dictionary.getField(field.name)
-				if (entry.isAssigned() && value == entry.Value) {
+				if (entry.isAssigned() && value != null && value == entry.Value) {
 					ctx.setBit(false)
 				} else {
-					ctx.setBit(true)
-					this.encodeByteVector(ctx, value, optional)
-					entry.assign(value)
+					if (optional && value == null && !entry.isAssigned()) {
+						ctx.setBit(false)
+					} else {
+						ctx.setBit(true)
+						this.encodeByteVector(ctx, value, optional)
+						entry.assign(value)
+					}
 				}
 				break
 			case 'default':
@@ -1635,10 +1636,11 @@ Encoder.prototype.encodeU64 = function(ctx, valueIn, optional)
 Encoder.prototype.encodeI32 = function(ctx, valueIn, optional)
 {
 	if (logInfo) console.log('ENCODE I32, VALUE:', valueIn, 'OPT?', optional)
+	/*
 	if (optional && valueIn == null) {
 		this.encodeNull(ctx)
 		return this
-	}
+	}*/
 
 	//var SIGN_SHIFT = (sizeof(T) * 8 - 7);
 	var value = (optional && valueIn >= 0) ? valueIn + 1 : valueIn
@@ -1667,10 +1669,11 @@ Encoder.prototype.encodeI32 = function(ctx, valueIn, optional)
 Encoder.prototype.encodeI64 = function(ctx, valueIn, optional)
 {
 	if (logInfo) console.log('ENCODE I64', valueIn, optional)
+	/*
 	if (optional && valueIn == null) {
 		this.encodeNull(ctx)
 		return this
-	}
+	}*/
 
 	var value = (optional && valueIn.greaterThanOrEqual(Long.ZERO)) ? valueIn.add(Long.ONE) : valueIn
 	if (logInfo) console.log('ENCODE I64 VAL', value.toString(16), optional, value.toBytesBE())
@@ -1712,6 +1715,11 @@ Encoder.prototype.encodeString = function(ctx, value, optional) {
 
 Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 {
+	if (optional && (value == null)) {
+		this.encodeNull(ctx)
+		return this
+	}
+
 	for (var pre = 0; pre < value.length && pre < dict.length && value.charCodeAt(pre) == dict.charCodeAt(pre); ++pre) {}
 	for (var i = value.length, j = dict.length; i > 0 && j > 0 && value.charCodeAt(i - 1) == dict.charCodeAt(j - 1); --i, --j) {}
 	var post = value.length - i
@@ -1737,11 +1745,6 @@ Encoder.prototype.encodeStringDelta = function(ctx, value, optional, dict)
 }
 
 Encoder.prototype.encodeByteVector = function(ctx, value, optional) {
-	if (optional && (value == null)) {
-		this.encodeNull(ctx)
-		return this
-	}
-
 	// encode length
 	this.encodeU32(ctx, value.length, optional)
 
