@@ -105,4 +105,4 @@ t.b.d.
 
 ## Contributing
 
-You are welcome!
+Everyone is welcome!
