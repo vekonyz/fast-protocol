@@ -1366,7 +1366,7 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, valueIn) {
 						ctx.setBit(true)
 						this.encodeNull(ctx)
 					}
-				} else if ( (value != null && value.m == field.operator.decimalValue.m && value.e == field.operator.decimalValue.e) || (optional && value == null && field.operator.value == null)) {
+				} else if ( (value != null && field.operator.decimalValue != null && value.m == field.operator.decimalValue.m && value.e == field.operator.decimalValue.e) || (optional && value == null && field.operator.value == null)) {
 					ctx.setBit(false)
 				} else {
 					ctx.setBit(true)
