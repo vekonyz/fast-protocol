@@ -35,7 +35,7 @@ function parseByteVector(str) {
 }
 
 function parseDecimal(str) {
-  if (!str) return undefined
+  if (str == null) return undefined
   // [1] SIGN
   // [2] + [4] MANTISSA
   // [6] EXPONENT
