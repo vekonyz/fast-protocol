@@ -95,7 +95,7 @@ function Element(name, type, id, presence, operator, elements, attributes) {
 
 	if (this.type == 'decimal' && this.operator && this.operator.value) this.operator.decimalValue = parseDecimal(this.operator.value)
 	if (this.type == 'byteVector' && this.operator && this.operator.value) this.operator.arrayValue = parseByteVector(this.operator.value)
-	if (this.type == 'string') this.isUnicode = attributes.charset && attributes.charset == 'unicode'
+	if (this.type == 'string') this.isUnicode = attributes.charset != null && attributes.charset == 'unicode'
 
 	switch (type) {
 		case 'message':
@@ -152,7 +152,9 @@ Element.prototype.presenceBits = function() {
 
 Element.parseElement = function(parent, element, presence) {
 	var operator = getOperator(element.elements)
-	var field = new Element(element.attributes.name, element.name, element.attributes.id, presence ? presence : element.attributes.presence, !operator ? undefined : {name: operator.name, key: !operator.attributes || !operator.attributes.key ? element.attributes.name : operator.attributes.key, value: !operator.attributes ? undefined : operator.attributes.value}, element.elements, parent, element.attributes)
+	var field = new Element(element.attributes.name, element.name, element.attributes.id, presence ? presence : element.attributes.presence,
+		!operator ? undefined : {name: operator.name, key: !operator.attributes || !operator.attributes.key ? element.attributes.name : operator.attributes.key, value: !operator.attributes ? undefined : operator.attributes.value},
+		element.elements, element.attributes)
 	field.pmap = field.presenceBits()
 	if (parent)	{
 		parent.addElement(field)
@@ -553,6 +555,11 @@ Decoder.prototype.decodeDecimalValue = function(ctx, field) {
 
 Decoder.prototype.decodeStringValue = function(ctx, field) {
 	if (logDecode) console.log('DecodeStringValue', field.name, field.presence, field.operator)
+
+  if (field.isUnicode) {
+    return Buffer.from(this.decodeByteVector(ctx, field)).toString('utf-8')
+	}
+
 	var optional = field.isOptional()
 	if (!field.hasOperator()) return this.decodeString(optional)
 
