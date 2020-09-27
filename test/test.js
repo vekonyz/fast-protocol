@@ -680,6 +680,10 @@ testCodec([
       SendingTime: [ 21, 105, 89, 139, 55, 77, 80, 125 ] }
   },
   {
+    name: "FASTReset",
+    msg: { }
+  },
+  {
     name: "RDPacketHeader",
     msg: { SenderCompID: 2,
       PacketSeqNum: [ 0, 8, 58, 10 ],
