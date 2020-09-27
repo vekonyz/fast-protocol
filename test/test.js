@@ -88,7 +88,6 @@ function testCodec(messages) {
 
 console.log('Start testing fast-protocol encode/decode')
 
-
 testCodec([
   {
     name: "Int32TestMessage",
@@ -651,6 +650,26 @@ testCodec([
     }
   }
 ])
+
+testCodec([
+  {
+    name: "UnicodeStringMessage",
+    msg: {
+        MandatoryUnicodeString: "Фьючерсный контракт NBR-12.20",
+        MandatoryUnicodeStringCopy: "Фьючерсный контракт NBR-12.20"/*,
+        MandatoryStringDelta: "Фьючерсный контракт NBR-12.20"*/
+    }
+  },
+  {
+    name: "UnicodeStringMessage",
+    msg: {
+        MandatoryUnicodeString: "Hello World",
+        MandatoryUnicodeStringCopy: "Hello World"/*,
+        MandatoryStringDelta: "!Hello World"*/
+    }
+  }
+])
+
 
 // test RDPacketHeader
 testCodec([

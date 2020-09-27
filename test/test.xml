@@ -274,6 +274,14 @@
     </sequence>
   </template>
 
+  <template id="14" name="UnicodeStringMessage">
+    <string name="MandatoryUnicodeString" charset="unicode" id="1"> </string>
+    <string name="MandatoryUnicodeStringCopy" charset="unicode" id="2"> <copy/> </string>
+	<!--
+    <string name="MandatoryStringDelta" charset="unicode" id="3"> <delta/> </string>
+	-->
+  </template>
+
   <template id="100" name="UInt32EncodingTestMessage">
     <uInt32 name="MandatoryUInt32"></uInt32>
   </template>

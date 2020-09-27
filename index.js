@@ -585,10 +585,10 @@ Decoder.prototype.decodeDecimalValue = function(ctx, field) {
 }
 
 Decoder.prototype.decodeStringValue = function(ctx, field) {
-	if (logDecode) console.log('DecodeStringValue', field.name, field.presence, field.operator)
+	if (logDecode) console.log('DecodeStringValue', field.name, field.presence, field.isUnicode ? 'unicode' : 'ascii', field.operator)
 
   if (field.isUnicode) {
-    return Buffer.from(this.decodeByteVector(ctx, field)).toString('utf-8')
+    return Buffer.from(this.decodeByteVectorValue(ctx, field)).toString('utf-8')
 	}
 
 	var optional = field.isOptional()
@@ -1444,7 +1444,7 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, valueIn) {
 }
 
 Encoder.prototype.encodeStringValue = function(ctx, field, value) {
-	if (logEncode) console.log('EncodeStringValue:', field.name, value, field.isOptional())
+	if (logEncode) console.log('EncodeStringValue: ' + field.name + ' "' + value + '"', field.isOptional())
 
   if (field.isUnicode) {
 		this.encodeByteVectorValue(ctx, field, toUTF8Array(value))
