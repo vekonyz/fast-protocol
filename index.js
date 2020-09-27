@@ -14,6 +14,37 @@ var logInfo = false
 var logDecode = false
 var logEncode = false
 
+function toUTF8Array(str) {
+    var utf8 = [];
+    for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+            utf8.push(0xc0 | (charcode >> 6),
+                      0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+            utf8.push(0xe0 | (charcode >> 12),
+                      0x80 | ((charcode>>6) & 0x3f),
+                      0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+            i++;
+            // UTF-16 encodes 0x10000-0x10FFFF by
+            // subtracting 0x10000 and splitting the
+            // 20 bits of 0x0-0xFFFFF into two halves
+            charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+                      | (str.charCodeAt(i) & 0x3ff));
+            utf8.push(0xf0 | (charcode >>18),
+                      0x80 | ((charcode>>12) & 0x3f),
+                      0x80 | ((charcode>>6) & 0x3f),
+                      0x80 | (charcode & 0x3f));
+        }
+    }
+    return utf8;
+}
+
 function toHexString(byteArray) {
   var s = '';
   byteArray.forEach(function(byte) {
@@ -1414,6 +1445,12 @@ Encoder.prototype.encodeDecimalValue = function(ctx, field, valueIn) {
 
 Encoder.prototype.encodeStringValue = function(ctx, field, value) {
 	if (logEncode) console.log('EncodeStringValue:', field.name, value, field.isOptional())
+
+  if (field.isUnicode) {
+		this.encodeByteVectorValue(ctx, field, toUTF8Array(value))
+		return
+	}
+
 	var pos = ctx.buffer.length
 	var optional = field.isOptional()
 	if (!field.hasOperator()) {
